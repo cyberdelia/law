@@ -50,4 +50,3 @@ This is alpha software, don't use it for anything serious.
 Take also note of theses specifics problems:
 
  - Upload or download aren't made in parallel, this is highly inefficient.
- - Errors during backup are not handle properly.
