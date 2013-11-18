@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"errors"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -71,8 +70,8 @@ func (a *Archive) Copy(w io.WriteCloser) error {
 	return archive.Close()
 }
 
-func walker(root string, files chan *File) filepath.WalkFunc {
-	return func(path string, info os.FileInfo, err error) error {
+func walk(cluster string) (files []*File, err error) {
+	err = filepath.Walk(cluster, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			// An error occured, stop processing
 			return err
@@ -85,54 +84,42 @@ func walker(root string, files chan *File) filepath.WalkFunc {
 			// Ignore configuration and pid files
 			return nil
 		}
-		rel, err := filepath.Rel(root, path)
+		rel, err := filepath.Rel(cluster, path)
 		if err != nil {
 			return err
 		}
-		files <- &File{
+		files = append(files, &File{
 			Path:     path,
 			Rel:      rel,
 			FileInfo: info,
-		}
+		})
 		return nil
+	})
+	return files, err
+}
+
+func Partition(cluster string) (archives []*Archive, err error) {
+	var size int64
+	var members []*File
+	files, err := walk(cluster)
+	if err != nil {
+		return nil, err
 	}
-}
-
-func walk(cluster string) chan *File {
-	files := make(chan *File)
-	go func() {
-		err := filepath.Walk(cluster, walker(cluster, files))
-		if err != nil {
-			log.Println(err)
+	for _, file := range files {
+		if file.FileInfo.Size() > MaxPartitionSize {
+			// File is bigger than the max size of partition
+			return nil, ErrMemberTooBig
 		}
-		close(files)
-	}()
-	return files
-}
-
-func Partition(cluster string) chan *Archive {
-	archives := make(chan *Archive)
-	go func() {
-		var size int64
-		var members []*File
-		for file := range walk(cluster) {
-			if file.FileInfo.Size() > MaxPartitionSize {
-				// File is bigger than the max size of partition
-				log.Println(ErrMemberTooBig)
-			}
-			if (size+file.FileInfo.Size() >= MaxPartitionSize) ||
-				(len(members) >= MaxPartitionMembers) {
-				archives <- &Archive{members}
-				members = make([]*File, 0)
-				size = 0
-			}
-			members = append(members, file)
-			size += file.FileInfo.Size()
+		if (size+file.FileInfo.Size() >= MaxPartitionSize) ||
+			(len(members) >= MaxPartitionMembers) {
+			archives = append(archives, &Archive{members})
+			members = make([]*File, 0)
+			size = 0
 		}
-		archives <- &Archive{members}
-		close(archives)
-	}()
-	return archives
+		members = append(members, file)
+		size += file.FileInfo.Size()
+	}
+	return append(archives, &Archive{members}), nil
 }
 
 func Unite(cluster string, partition io.ReadCloser) error {

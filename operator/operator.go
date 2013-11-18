@@ -75,12 +75,11 @@ func (o *Operator) Backup(cluster string) error {
 		return err
 	}
 	defer db.StopBackup()
-	_, err = db.Version()
+	partitions, err := Partition(cluster)
 	if err != nil {
 		return err
 	}
-	n := 0
-	for part := range Partition(cluster) {
+	for n, part := range partitions {
 		w, err := o.s.Backup(backup.Name, backup.Offset, n)
 		if err != nil {
 			return err
@@ -95,7 +94,6 @@ func (o *Operator) Backup(cluster string) error {
 		if err = pipe.Close(); err != nil {
 			return err
 		}
-		n += 1
 	}
 	backup, err = db.StopBackup()
 	if err != nil {
