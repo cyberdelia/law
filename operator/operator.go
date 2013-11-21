@@ -36,7 +36,7 @@ func (o *Operator) Unarchive(name string, dest string) error {
 	if err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeRead(r, pipeline.RateLimitReadPipeline(10e6), pipeline.LZOReadPipeline)
+	pipe, err := pipeline.PipeRead(r, pipeline.LZOReadPipeline)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (o *Operator) Restore(cluster, name string) error {
 		return err
 	}
 	for _, r := range readers {
-		pipe, err := pipeline.PipeRead(r, pipeline.RateLimitReadPipeline(10e6), pipeline.LZOReadPipeline)
+		pipe, err := pipeline.PipeRead(r, pipeline.LZOReadPipeline)
 		if err != nil {
 			return err
 		}
