@@ -2,6 +2,8 @@ language: go
 go:
   - 1.1
   - tip
+env:
+  - DATABASE_URL=postgres://postgres@localhost
 addons:
   postgresql: "9.3"
 before_install:
