@@ -7,7 +7,7 @@ import (
 func TestUnsupportedStorage(t *testing.T) {
 	_, err := NewStorage("scheme://host/path")
 	if err != ErrUnsupported {
-		t.Fatal()
+		t.Fatal(err)
 	}
 }
 

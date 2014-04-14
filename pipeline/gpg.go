@@ -1,9 +1,10 @@
 package pipeline
 
 import (
-	"code.google.com/p/go.crypto/openpgp"
 	"io"
 	"io/ioutil"
+
+	"code.google.com/p/go.crypto/openpgp"
 )
 
 func GPGWritePipeline(to []*openpgp.Entity) WritePipeline {

@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
-	"github.com/cyberdelia/law/operator"
 	"log"
 	"os"
 	"runtime/pprof"
+
+	"github.com/cyberdelia/law/operator"
 )
 
 type walPush struct {

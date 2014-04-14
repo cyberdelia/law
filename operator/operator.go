@@ -2,11 +2,12 @@ package operator
 
 import (
 	"errors"
-	"github.com/cyberdelia/law/pipeline"
-	"github.com/cyberdelia/law/storage"
 	"io"
 	"os"
 	"path"
+
+	"github.com/cyberdelia/law/pipeline"
+	"github.com/cyberdelia/law/storage"
 )
 
 var (

@@ -3,8 +3,9 @@ package operator
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
 	"time"
+
+	_ "github.com/lib/pq"
 )
 
 type Database struct {

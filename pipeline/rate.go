@@ -1,9 +1,10 @@
 package pipeline
 
 import (
-	"github.com/cyberdelia/ratio"
 	"io"
 	"time"
+
+	"github.com/cyberdelia/ratio"
 )
 
 func RateLimitWritePipeline(size int) WritePipeline {

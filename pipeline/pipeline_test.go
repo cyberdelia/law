@@ -29,12 +29,12 @@ func TestPipeWriter(t *testing.T) {
 	output := new(buffer)
 	w, err := PipeWrite(output, encodePipeline)
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 	io.Copy(w, input)
 	w.Close()
 	if output.String() != "YWxvaGE=" {
-		t.Fatal()
+		t.Errorf("unexpected output, wants %s, got %s", "YWxvaGE=", output.String())
 	}
 }
 
@@ -44,11 +44,11 @@ func TestPipeRead(t *testing.T) {
 	output := new(bytes.Buffer)
 	r, err := PipeRead(input, decodePipeline)
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 	io.Copy(output, r)
 	r.Close()
 	if output.String() != "aloha" {
-		t.Fatal()
+		t.Errorf("unexpected output, wants %s, got %s", "aloha", output.String())
 	}
 }

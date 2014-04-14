@@ -1,11 +1,12 @@
 package storage
 
 import (
-	"github.com/kr/s3/s3util"
 	"io"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/kr/s3/s3util"
 )
 
 func init() {

@@ -1,8 +1,9 @@
 package pipeline
 
 import (
-	"github.com/cyberdelia/lzo"
 	"io"
+
+	"github.com/cyberdelia/lzo"
 )
 
 func LZOWritePipeline(w io.WriteCloser) (io.WriteCloser, error) {
