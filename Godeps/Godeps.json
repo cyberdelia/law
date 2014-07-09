@@ -1,0 +1,33 @@
+{
+	"ImportPath": "github.com/cyberdelia/law",
+	"GoVersion": "go1.3",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go.crypto/cast5",
+			"Comment": "null-185",
+			"Rev": "6478cc9340cbbe6c04511280c5007722269108e9"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/openpgp",
+			"Comment": "null-185",
+			"Rev": "6478cc9340cbbe6c04511280c5007722269108e9"
+		},
+		{
+			"ImportPath": "github.com/cyberdelia/lzo",
+			"Comment": "1.0-7-g12117cb",
+			"Rev": "12117cb35b3ed95c2692cab524ee83d455fceddd"
+		},
+		{
+			"ImportPath": "github.com/cyberdelia/ratio",
+			"Rev": "1f1b60c5ec786b06a02fe89237ba0e1d5c993788"
+		},
+		{
+			"ImportPath": "github.com/kr/s3",
+			"Rev": "495b6d5419e7b4257b0fa75fb4552f5fe4fa879a"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Rev": "8f04589ca96b0d07e3ed90d532710d63e30557fe"
+		}
+	]
+}
