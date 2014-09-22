@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/cyberdelia/law/pipeline"
 	"github.com/cyberdelia/law/storage"
+	"github.com/cyberdelia/pipeline"
 )
 
 var (
@@ -37,7 +37,7 @@ func (o *Operator) Unarchive(name string, dest string) error {
 	if err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeRead(r, pipeline.LZOReadPipeline)
+	pipe, err := pipeline.PipeRead(r, LZOReadPipeline)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (o *Operator) Archive(name string) error {
 	if err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeWrite(w, pipeline.RateLimitWritePipeline(10e6), pipeline.LZOWritePipeline)
+	pipe, err := pipeline.PipeWrite(w, RateLimitWritePipeline(10e6), LZOWritePipeline)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (o *Operator) Backup(cluster string) error {
 		if err != nil {
 			return err
 		}
-		pipe, err := pipeline.PipeWrite(w, pipeline.RateLimitWritePipeline(10e6), pipeline.LZOWritePipeline)
+		pipe, err := pipeline.PipeWrite(w, RateLimitWritePipeline(10e6), LZOWritePipeline)
 		if err != nil {
 			return err
 		}
@@ -118,7 +118,7 @@ func (o *Operator) Restore(cluster, name string) error {
 		return err
 	}
 	for _, r := range readers {
-		pipe, err := pipeline.PipeRead(r, pipeline.LZOReadPipeline)
+		pipe, err := pipeline.PipeRead(r, LZOReadPipeline)
 		if err != nil {
 			return err
 		}
