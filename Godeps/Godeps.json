@@ -21,6 +21,10 @@
 			"Rev": "12117cb35b3ed95c2692cab524ee83d455fceddd"
 		},
 		{
+			"ImportPath": "github.com/cyberdelia/pipeline",
+			"Rev": "8cc53aed662effbff3aa794db194ffa5d5461844"
+		},
+		{
 			"ImportPath": "github.com/cyberdelia/ratio",
 			"Rev": "1f1b60c5ec786b06a02fe89237ba0e1d5c993788"
 		},
