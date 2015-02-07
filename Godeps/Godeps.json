@@ -17,8 +17,8 @@
 		},
 		{
 			"ImportPath": "github.com/cyberdelia/lzo",
-			"Comment": "1.0-7-g12117cb",
-			"Rev": "12117cb35b3ed95c2692cab524ee83d455fceddd"
+			"Comment": "1.0-21-gff8136a",
+			"Rev": "ff8136adbaa2e3b722e875a96605d6ceaec730eb"
 		},
 		{
 			"ImportPath": "github.com/cyberdelia/pipeline",

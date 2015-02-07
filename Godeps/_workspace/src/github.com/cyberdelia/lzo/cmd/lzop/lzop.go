@@ -2,15 +2,16 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"github.com/cyberdelia/lzo"
 	"io"
+	"log"
 	"os"
+
+	"github.com/cyberdelia/lzo"
 )
 
 var (
-	uncompress = flag.Bool("decompress", false, "Decompress.")
-	level      = flag.Int("level", 3, "Compression level.")
+	uncompress = flag.Bool("d", false, "Decompress.")
+	level      = flag.Int("l", 3, "Compression level.")
 )
 
 func decompress(path string) error {
@@ -63,8 +64,16 @@ func compress(level int, path string) error {
 }
 
 func main() {
+	log.SetFlags(0)
+
 	flag.Parse()
+
 	path := flag.Arg(0)
+	if path == "" {
+		flag.Usage()
+		os.Exit(1)
+	}
+
 	var err error
 	if *uncompress == true {
 		err = decompress(path)
@@ -72,6 +81,6 @@ func main() {
 		err = compress(*level, path)
 	}
 	if err != nil {
-		fmt.Println("lzop:", err)
+		log.Println("lzop:", err)
 	}
 }

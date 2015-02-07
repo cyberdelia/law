@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"runtime"
 	"testing"
+	"testing/quick"
 )
 
 type lzoTest struct {
@@ -268,30 +269,33 @@ func TestDecompressor(t *testing.T) {
 	}
 }
 
-func TestRoundTrip(t *testing.T) {
+func roundTrip(name string, payload []byte) bool {
 	buf := new(bytes.Buffer)
+
 	w := NewWriter(buf)
-	w.Name = "name"
-	if _, err := w.Write([]byte("payload")); err != nil {
-		t.Fatalf("Write: %v", err)
+	w.Name = name
+	if _, err := w.Write(payload); err != nil {
+		return false
 	}
+	w.Close()
 
 	r, err := NewReader(buf)
 	if err != nil {
-		t.Fatalf("NewReader: %v", err)
+		return false
 	}
+	defer r.Close()
+
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
-		t.Fatalf("ReadAll: %v", err)
+		return false
 	}
-	if string(b) != "payload" {
-		t.Fatalf("payload is %q, want %q", string(b), "payload")
-	}
-	if r.Name != "name" {
-		t.Fatalf("name is %q, want %q", r.Name, "name")
-	}
-	if err := r.Close(); err != nil {
-		t.Fatalf("Reader.Close: %v", err)
+
+	return bytes.Equal(b, payload) && r.Name == name
+}
+
+func TestRoundTrip(t *testing.T) {
+	if err := quick.Check(roundTrip, nil); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -310,18 +314,36 @@ func TestWriterReset(t *testing.T) {
 	}
 }
 
-func BenchmarkCompressor(b *testing.B) {
-	raw := []byte(lzoTests[4].raw)
+func BenchmarkDecompressor(b *testing.B) {
+	b.ReportAllocs()
 	b.StopTimer()
-	b.SetBytes(int64(len(raw)))
+	compressed, err := ioutil.ReadFile("testdata/pg135.txt.lzo")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.SetBytes(int64(len(compressed)))
 	runtime.GC()
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		w, err := NewWriterLevel(ioutil.Discard, DefaultCompression)
-		if err != nil {
-			b.Fatal(err)
-		}
-		w.Write(raw)
-		w.Close()
+		r, _ := NewReader(bytes.NewReader(compressed))
+		defer r.Close()
+		io.Copy(ioutil.Discard, r)
+	}
+}
+
+func BenchmarkCompressor(b *testing.B) {
+	b.ReportAllocs()
+	b.StopTimer()
+	text, err := ioutil.ReadFile("testdata/pg135.txt")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.SetBytes(int64(len(text)))
+	runtime.GC()
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		w, _ := NewWriterLevel(ioutil.Discard, DefaultCompression)
+		defer w.Close()
+		io.Copy(w, bytes.NewReader(text))
 	}
 }
