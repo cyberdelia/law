@@ -10,10 +10,6 @@ import (
 	"github.com/cyberdelia/pipeline"
 )
 
-var (
-	ErrOverwrite = errors.New("attempt to overwrite a live data directory")
-)
-
 type Operator struct {
 	s *storage.Storage
 }
@@ -108,7 +104,7 @@ func (o *Operator) Backup(cluster string) error {
 
 func (o *Operator) Restore(cluster, name string) error {
 	if _, err := os.Stat(path.Join(cluster, "postmaster.pid")); err == nil {
-		return ErrOverwrite
+		return errors.New("attempt to overwrite a live data directory")
 	}
 	readers, err := o.s.Restore(name)
 	if err != nil {

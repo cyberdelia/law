@@ -11,12 +11,10 @@ import (
 )
 
 const (
+	// MaxPartitionSize represents the maximun size of a partition.
 	MaxPartitionSize    = 1610612736
+	// MaxPartitionMembers represents the maximun numbers of menbers in a partition.
 	MaxPartitionMembers = int(MaxPartitionSize / 262144)
-)
-
-var (
-	ErrMemberTooBig = errors.New("file too big for tar partition")
 )
 
 type File struct {
@@ -108,7 +106,7 @@ func Partition(cluster string) (archives []*Archive, err error) {
 	for _, file := range files {
 		if file.FileInfo.Size() > MaxPartitionSize {
 			// File is bigger than the max size of partition
-			return nil, ErrMemberTooBig
+			return nil, errors.New("file too big for tar partition")
 		}
 		if (size+file.FileInfo.Size() >= MaxPartitionSize) ||
 			(len(members) >= MaxPartitionMembers) {

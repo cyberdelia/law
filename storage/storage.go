@@ -7,22 +7,16 @@ import (
 	"net/url"
 )
 
-const (
-	CurrentVersion = "001"
-)
+const CurrentVersion = "001"
 
-var (
-	ErrUnsupported = errors.New("unsupported storage")
-)
-
-type StorageBackend interface {
+type Backend interface {
 	Create(name string) (io.WriteCloser, error)
 	Open(name string) (io.ReadCloser, error)
 	List(name string) ([]io.ReadCloser, error)
 }
 
 type Storage struct {
-	b StorageBackend
+	b Backend
 }
 
 func NewStorage(uri string) (*Storage, error) {
@@ -30,17 +24,17 @@ func NewStorage(uri string) (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
-	var backend StorageBackend
+	var b Backend
 	switch u.Scheme {
 	case "file":
-		backend = NewFileStorage(u)
+		b = NewFileStorage(u)
 	case "s3":
-		backend = NewS3Storage(u)
+		b = NewS3Storage(u)
 	default:
-		return nil, ErrUnsupported
+		return nil, errors.New("unsupported storage")
 	}
 	return &Storage{
-		b: backend,
+		b: b,
 	}, nil
 }
 
