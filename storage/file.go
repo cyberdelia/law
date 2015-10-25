@@ -8,16 +8,20 @@ import (
 	"path/filepath"
 )
 
+// FileStorage represents a directory based file storage.
 type FileStorage struct {
 	basedir string
 }
 
+// NewFileStorage creates a new FileStorage based on the given
+// file:/// URL.
 func NewFileStorage(u *url.URL) *FileStorage {
 	return &FileStorage{
 		basedir: u.Path,
 	}
 }
 
+// Open opens the given filename.
 func (s FileStorage) Open(name string) (io.ReadCloser, error) {
 	filename, err := preparePath(s.basedir, name)
 	if err != nil {
@@ -26,6 +30,7 @@ func (s FileStorage) Open(name string) (io.ReadCloser, error) {
 	return os.Open(filename)
 }
 
+// Create creates a new file based on the given filename.
 func (s FileStorage) Create(name string) (io.WriteCloser, error) {
 	filename, err := preparePath(s.basedir, name)
 	if err != nil {
@@ -34,6 +39,7 @@ func (s FileStorage) Create(name string) (io.WriteCloser, error) {
 	return os.Create(filename)
 }
 
+// List lists all files presents in the file storage.
 func (s FileStorage) List(name string) (files []io.ReadCloser, err error) {
 	basedir, err := preparePath(s.basedir, name)
 	if err != nil {
