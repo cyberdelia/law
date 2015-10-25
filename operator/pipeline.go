@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"time"
 
-	"code.google.com/p/go.crypto/openpgp"
+	"golang.org/x/crypto/openpgp"
 	"github.com/cyberdelia/lzo"
 	"github.com/cyberdelia/pipeline"
 	"github.com/cyberdelia/ratio"

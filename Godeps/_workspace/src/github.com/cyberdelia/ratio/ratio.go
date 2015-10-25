@@ -1,5 +1,5 @@
 /*
-Rate limited io
+Package ratio allows to make rate limited i/o.
 
 To create a rate limited io.Writer:
 
@@ -13,6 +13,18 @@ package ratio
 import (
 	"io"
 	"time"
+)
+
+const (
+	step = 1000
+	KB   = iota * step
+	MB   = KB * step
+	GB   = MB * step
+	TB   = GB * step
+	PB   = TB * step
+	EB   = PB * step
+	ZB   = EB * step
+	YB   = ZB * step
 )
 
 type values struct {
@@ -97,7 +109,7 @@ func (rl *rateLimiter) close() {
 	}
 }
 
-// Returns a rate limited io.Writer, allowing to write up to size bytes per duration.
+// RateLimitedWriter returns a rate limited io.Writer, allowing to write up to size bytes per duration.
 func RateLimitedWriter(w io.Writer, size int, duration time.Duration) io.WriteCloser {
 	rl := &rateLimiter{
 		action: func(p []byte) (int, error) {
@@ -112,7 +124,7 @@ func RateLimitedWriter(w io.Writer, size int, duration time.Duration) io.WriteCl
 	return rl
 }
 
-// Returns a rate limited io.Reader, allowing to read up to size bytes per duration.
+// RateLimitedReader returns a rate limited io.Reader, allowing to read up to size bytes per duration.
 func RateLimitedReader(r io.Reader, size int, duration time.Duration) io.ReadCloser {
 	rl := &rateLimiter{
 		action: func(p []byte) (int, error) {
