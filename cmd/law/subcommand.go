@@ -17,6 +17,7 @@ type subCommandParser struct {
 	fs  *flag.FlagSet
 }
 
+// Parse parses all given subCommands.
 func Parse(commands ...subCommand) {
 	scp := make(map[string]*subCommandParser, len(commands))
 	for _, cmd := range commands {

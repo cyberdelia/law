@@ -10,10 +10,12 @@ import (
 	"github.com/cyberdelia/pipeline"
 )
 
+// Operator contains all operations.
 type Operator struct {
 	s *storage.Storage
 }
 
+// NewOperator creates a new operator.
 func NewOperator() (*Operator, error) {
 	s, err := storage.NewStorage(os.Getenv("STORAGE_URL"))
 	if err != nil {
@@ -24,6 +26,7 @@ func NewOperator() (*Operator, error) {
 	}, nil
 }
 
+// Unarchive restore the given wal segment to the destination.
 func (o *Operator) Unarchive(name string, dest string) error {
 	file, err := os.Create(dest)
 	if err != nil {
@@ -43,6 +46,7 @@ func (o *Operator) Unarchive(name string, dest string) error {
 	return pipe.Close()
 }
 
+// Archive archives the given wal segment.
 func (o *Operator) Archive(name string) error {
 	file, err := os.Open(name)
 	if err != nil {
@@ -62,6 +66,7 @@ func (o *Operator) Archive(name string) error {
 	return pipe.Close()
 }
 
+// Backup backups the given cluster directory.
 func (o *Operator) Backup(cluster string) error {
 	db, err := NewDatabase(os.Getenv("DATABASE_URL"))
 	if err != nil {
@@ -102,6 +107,7 @@ func (o *Operator) Backup(cluster string) error {
 	return nil
 }
 
+// Restore a named backup to the given cluster directory.
 func (o *Operator) Restore(cluster, name string) error {
 	if _, err := os.Stat(path.Join(cluster, "postmaster.pid")); err == nil {
 		return errors.New("attempt to overwrite a live data directory")

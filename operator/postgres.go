@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	// load postgres drivers
 	_ "github.com/lib/pq"
 )
 

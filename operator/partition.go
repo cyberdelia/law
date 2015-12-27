@@ -12,25 +12,29 @@ import (
 
 const (
 	// MaxPartitionSize represents the maximun size of a partition.
-	MaxPartitionSize    = 1610612736
+	MaxPartitionSize = 1610612736
 	// MaxPartitionMembers represents the maximun numbers of menbers in a partition.
 	MaxPartitionMembers = int(MaxPartitionSize / 262144)
 )
 
+// File represents an archvie file.
 type File struct {
 	Path     string
 	Rel      string
 	FileInfo os.FileInfo
 }
 
+// String returns the path of a file.
 func (f *File) String() string {
 	return f.Path
 }
 
+// Archive represents an archive.
 type Archive struct {
 	members []*File
 }
 
+// Copy writes a tar archive of all members.
 func (a *Archive) Copy(w io.WriteCloser) error {
 	archive := tar.NewWriter(w)
 	for _, member := range a.members {
@@ -96,6 +100,7 @@ func walk(cluster string) (files []*File, err error) {
 	return files, err
 }
 
+// Partition creates multiple archives for the given directory.
 func Partition(cluster string) (archives []*Archive, err error) {
 	var size int64
 	var members []*File
@@ -120,6 +125,7 @@ func Partition(cluster string) (archives []*Archive, err error) {
 	return append(archives, &Archive{members}), nil
 }
 
+// Unite untar a partition for the given directory.
 func Unite(cluster string, partition io.ReadCloser) error {
 	archive := tar.NewReader(partition)
 	for {

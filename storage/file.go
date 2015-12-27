@@ -39,7 +39,7 @@ func (s FileStorage) Create(name string) (io.WriteCloser, error) {
 	return os.Create(filename)
 }
 
-// List lists all files presents in the file storage.
+// List lists all files presents in the file storage after the given prefix.
 func (s FileStorage) List(name string) (files []io.ReadCloser, err error) {
 	basedir, err := preparePath(s.basedir, name)
 	if err != nil {

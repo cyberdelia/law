@@ -15,10 +15,13 @@ func init() {
 	s3util.DefaultConfig.SecurityToken = os.Getenv("AWS_SECURITY_TOKEN")
 }
 
+// S3Storage represents a s3 based file storage.
 type S3Storage struct {
 	prefix string
 }
 
+// NewS3Storage create a new S3Storage base on
+// a s3:/// URL.
 func NewS3Storage(u *url.URL) *S3Storage {
 	u.Scheme = "https"
 	return &S3Storage{
@@ -26,16 +29,19 @@ func NewS3Storage(u *url.URL) *S3Storage {
 	}
 }
 
+// Create creates a new file based on the given filename.
 func (s S3Storage) Create(name string) (io.WriteCloser, error) {
 	url := urlJoin(s.prefix, name)
 	return s3util.Create(url, nil, nil)
 }
 
+// Open opens the given filename.
 func (s S3Storage) Open(name string) (io.ReadCloser, error) {
 	url := urlJoin(s.prefix, name)
 	return s3util.Open(url, nil)
 }
 
+// List lists all files present in the file storage after the given prefix.
 func (s S3Storage) List(name string) (files []io.ReadCloser, err error) {
 	baseurl := urlJoin(s.prefix, name)
 	basedir, err := s3util.NewFile(baseurl, nil)
