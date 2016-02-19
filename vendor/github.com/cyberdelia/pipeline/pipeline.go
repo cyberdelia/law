@@ -1,8 +1,6 @@
 package pipeline
 
-import (
-	"io"
-)
+import "io"
 
 // WritePipeline type is an adapter to allow the use of different
 // writer as pipeline steps.
