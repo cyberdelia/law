@@ -2,7 +2,7 @@
 	"ImportPath": "github.com/cyberdelia/law",
 	"GoVersion": "go1.6",
 	"Packages": [
-		"./..."
+		"./cmd/..."
 	],
 	"Deps": [
 		{
