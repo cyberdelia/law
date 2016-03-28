@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"time"
 
-	"golang.org/x/crypto/openpgp"
 	"github.com/cyberdelia/lzo"
 	"github.com/cyberdelia/pipeline"
 	"github.com/cyberdelia/ratio"
+	"golang.org/x/crypto/openpgp"
 )
 
 // GPGWritePipeline returns a WritePipeline that will encrypt data.

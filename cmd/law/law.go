@@ -47,6 +47,7 @@ func (cmd *walFetch) DefineFlags(fs *flag.FlagSet) {
 	cmd.segment = fs.String("segment", "", "Name of the WAL segment to download")
 	cmd.destination = fs.String("destination", "", "Path of WAL segment locally")
 }
+
 func (cmd *walFetch) Run() {
 	if *cmd.segment == "" {
 		log.Fatalln("law: wal segment required")
