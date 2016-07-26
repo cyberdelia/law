@@ -5,46 +5,30 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/cyberdelia/lzo"
 	"github.com/cyberdelia/pipeline"
 	"github.com/cyberdelia/ratio"
-	"golang.org/x/crypto/openpgp"
+	"github.com/pierrec/lz4"
 )
 
-// GPGWritePipeline returns a WritePipeline that will encrypt data.
-func GPGWritePipeline(to []*openpgp.Entity) pipeline.WritePipeline {
-	return func(w io.WriteCloser) (io.WriteCloser, error) {
-		return openpgp.Encrypt(w, to, nil, nil, nil)
-	}
+// lz4WritePipeline returns a WritePipeline that will compress data.
+func lz4WritePipeline(w io.WriteCloser) (io.WriteCloser, error) {
+	return lz4.NewWriter(w), nil
 }
 
-// GPGReadPipeline returns a ReadPipeline that will decrypt data.
-func GPGReadPipeline(keyring openpgp.KeyRing) pipeline.ReadPipeline {
-	return func(r io.ReadCloser) (io.ReadCloser, error) {
-		message, err := openpgp.ReadMessage(r, keyring, nil, nil)
-		return ioutil.NopCloser(message.UnverifiedBody), err
-	}
+// lz4ReadPipeline returns a ReadPipeline that will decompress data.
+func lz4ReadPipeline(r io.ReadCloser) (io.ReadCloser, error) {
+	return ioutil.NopCloser(lz4.NewReader(r)), nil
 }
 
-// LZOWritePipeline returns a WritePipeline that will compress data.
-func LZOWritePipeline(w io.WriteCloser) (io.WriteCloser, error) {
-	return lzo.NewWriter(w), nil
-}
-
-// LZOReadPipeline returns a ReadPipeline that will decompress data.
-func LZOReadPipeline(r io.ReadCloser) (io.ReadCloser, error) {
-	return lzo.NewReader(r)
-}
-
-// RateLimitWritePipeline returns a WritePipeline that will rate-limit write I/O.
-func RateLimitWritePipeline(size int) pipeline.WritePipeline {
+// rateLimitWritePipeline returns a WritePipeline that will rate-limit write I/O.
+func rateLimitWritePipeline(size int) pipeline.WritePipeline {
 	return func(w io.WriteCloser) (io.WriteCloser, error) {
 		return ratio.RateLimitedWriter(w, size, time.Second), nil
 	}
 }
 
-// RateLimitReadPipeline returns a ReadPipeline that will rate-limit write I/O.
-func RateLimitReadPipeline(size int) pipeline.ReadPipeline {
+// rateLimitReadPipeline returns a ReadPipeline that will rate-limit write I/O.
+func rateLimitReadPipeline(size int) pipeline.ReadPipeline {
 	return func(r io.ReadCloser) (io.ReadCloser, error) {
 		return ratio.RateLimitedReader(r, size, time.Second), nil
 	}

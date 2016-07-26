@@ -36,7 +36,7 @@ func (o *Operator) Unarchive(name string, dest string) error {
 	if err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeRead(r, LZOReadPipeline)
+	pipe, err := pipeline.PipeRead(r, lz4ReadPipeline)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (o *Operator) Archive(name string) error {
 	if err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeWrite(w, RateLimitWritePipeline(10e6), LZOWritePipeline)
+	pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(10e6), lz4WritePipeline)
 	if err != nil {
 		return err
 	}
@@ -86,14 +86,14 @@ func (o *Operator) Backup(cluster string) error {
 		if err != nil {
 			return err
 		}
-		pipe, err := pipeline.PipeWrite(w, RateLimitWritePipeline(10e6), LZOWritePipeline)
+		pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(10e6), lz4WritePipeline)
 		if err != nil {
 			return err
 		}
-		if err = part.Copy(pipe); err != nil {
+		if err := part.Copy(pipe); err != nil {
 			return err
 		}
-		if err = pipe.Close(); err != nil {
+		if err := pipe.Close(); err != nil {
 			return err
 		}
 	}
@@ -120,7 +120,7 @@ func (o *Operator) Restore(cluster, name string) error {
 		return err
 	}
 	for _, r := range readers {
-		pipe, err := pipeline.PipeRead(r, LZOReadPipeline)
+		pipe, err := pipeline.PipeRead(r, lz4ReadPipeline)
 		if err != nil {
 			return err
 		}
