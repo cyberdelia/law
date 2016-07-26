@@ -1,15 +1,11 @@
 {
 	"ImportPath": "github.com/cyberdelia/law",
 	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
 	"Packages": [
 		"./cmd/..."
 	],
 	"Deps": [
-		{
-			"ImportPath": "github.com/cyberdelia/lzo",
-			"Comment": "1.0-24-g82ca2a3",
-			"Rev": "82ca2a37bbe6fbe4b616e66e8cbd4ababd5b892d"
-		},
 		{
 			"ImportPath": "github.com/cyberdelia/pipeline",
 			"Rev": "07dfcb3a8d888ef88eac0efc510536e1c0fd2fdf"
@@ -23,17 +19,27 @@
 			"Rev": "c070c8f9a8f0032d48f0d2a77d4e382788bd8a1d"
 		},
 		{
+			"ImportPath": "github.com/kr/s3/s3util",
+			"Rev": "c070c8f9a8f0032d48f0d2a77d4e382788bd8a1d"
+		},
+		{
 			"ImportPath": "github.com/lib/pq",
 			"Comment": "go1.0-cutoff-63-g11fc39a",
 			"Rev": "11fc39a580a008f1f39bb3d11d984fb34ed778d9"
 		},
 		{
-			"ImportPath": "golang.org/x/crypto/cast5",
-			"Rev": "f18420efc3b4f8e9f3d51f6bd2476e92c46260e9"
+			"ImportPath": "github.com/lib/pq/oid",
+			"Comment": "go1.0-cutoff-63-g11fc39a",
+			"Rev": "11fc39a580a008f1f39bb3d11d984fb34ed778d9"
 		},
 		{
-			"ImportPath": "golang.org/x/crypto/openpgp",
-			"Rev": "f18420efc3b4f8e9f3d51f6bd2476e92c46260e9"
+			"ImportPath": "github.com/pierrec/lz4",
+			"Rev": "383c0d87b5dd7c090d3cddefe6ff0c2ffbb88470"
+		},
+		{
+			"ImportPath": "github.com/pierrec/xxHash/xxHash32",
+			"Comment": "v0.1-4-g5a00444",
+			"Rev": "5a004441f897722c627870a981d02b29924215fa"
 		}
 	]
 }
