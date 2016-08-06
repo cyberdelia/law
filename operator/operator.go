@@ -16,8 +16,8 @@ type Operator struct {
 }
 
 // NewOperator creates a new operator.
-func NewOperator() (*Operator, error) {
-	s, err := storage.NewStorage(os.Getenv("STORAGE_URL"))
+func NewOperator(ssn string) (*Operator, error) {
+	s, err := storage.NewStorage(ssn)
 	if err != nil {
 		return nil, err
 	}

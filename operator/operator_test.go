@@ -1,13 +1,9 @@
 package operator
 
-import (
-	"os"
-	"testing"
-)
+import "testing"
 
 func TestNewOperator(t *testing.T) {
-	os.Setenv("STORAGE_URL", "file:///tmp")
-	if _, err := NewOperator(); err != nil {
+	if _, err := NewOperator("file:///tmp"); err != nil {
 		t.Fatal(err)
 	}
 }

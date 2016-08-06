@@ -44,13 +44,13 @@ func NewStorage(uri string) (*Storage, error) {
 
 // Archive returns a writer to archive the given wal segment.
 func (s Storage) Archive(name string) (io.WriteCloser, error) {
-	filename := fmt.Sprintf("law_%s/%s.lzo", CurrentVersion, name)
+	filename := fmt.Sprintf("law_%s/%s.lz4", CurrentVersion, name)
 	return s.b.Create(filename)
 }
 
 // Unarchive returns a reader to restore the given wal segment.
 func (s Storage) Unarchive(name string) (io.ReadCloser, error) {
-	filename := fmt.Sprintf("law_%s/%s.lzo", CurrentVersion, name)
+	filename := fmt.Sprintf("law_%s/%s.lz4", CurrentVersion, name)
 	return s.b.Open(filename)
 }
 

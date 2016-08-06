@@ -25,7 +25,7 @@ func (cmd *walPush) Run() {
 	if *cmd.segment == "" {
 		log.Fatalln("law: wal segment required")
 	}
-	o, err := operator.NewOperator()
+	o, err := operator.NewOperator(*storage)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func (cmd *walFetch) Run() {
 	if *cmd.destination == "" {
 		log.Fatalln("law: wal destination required")
 	}
-	o, err := operator.NewOperator()
+	o, err := operator.NewOperator(*storage)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,7 +80,7 @@ func (cmd *backupPush) Run() {
 	if *cmd.cluster == "" {
 		log.Fatalln("law: cluster directory required")
 	}
-	o, err := operator.NewOperator()
+	o, err := operator.NewOperator(*storage)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,7 +112,7 @@ func (cmd *backupFetch) Run() {
 	if *cmd.name == "" {
 		log.Fatalln("law: name of backup required")
 	}
-	o, err := operator.NewOperator()
+	o, err := operator.NewOperator(*storage)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -124,6 +124,7 @@ func (cmd *backupFetch) Run() {
 var (
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 	memprofile = flag.String("memprofile", "", "write memory profile to this file")
+	storage    = flag.String("storage", os.Getenv("STORAGE_URL"), "storage URL")
 )
 
 func main() {
