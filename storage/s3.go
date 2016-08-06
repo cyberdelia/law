@@ -1,65 +1,59 @@
 package storage
 
 import (
+	"fmt"
 	"io"
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
-	"github.com/kr/s3/s3util"
+	s3 "github.com/rlmcpherson/s3gof3r"
 )
-
-func init() {
-	s3util.DefaultConfig.AccessKey = os.Getenv("AWS_ACCESS_KEY")
-	s3util.DefaultConfig.SecretKey = os.Getenv("AWS_SECRET_KEY")
-	s3util.DefaultConfig.SecurityToken = os.Getenv("AWS_SECURITY_TOKEN")
-}
 
 // S3Storage represents a s3 based file storage.
 type S3Storage struct {
 	prefix string
+	bucket *s3.Bucket
+	config *s3.Config
 }
 
 // NewS3Storage create a new S3Storage base on
 // a s3:/// URL.
 func NewS3Storage(u *url.URL) *S3Storage {
-	u.Scheme = "https"
+	k, err := envKeys()
+	if err != nil {
+		panic(err)
+	}
+	storage := s3.New(u.Host, k)
+	var prefix string
+	parts := strings.SplitN(u.Path[1:], "/", 2)
+	if len(parts) > 1 {
+		prefix = parts[1]
+	}
 	return &S3Storage{
-		prefix: u.String(),
+		prefix: prefix,
+		bucket: storage.Bucket(parts[0]),
+		config: &s3.Config{
+			Concurrency: 10,
+			PartSize:    20971520,
+			NTry:        10,
+			Md5Check:    false,
+			Scheme:      "https",
+			Client:      s3.ClientWithTimeout(5 * time.Second),
+		},
 	}
 }
 
 // Create creates a new file based on the given filename.
 func (s S3Storage) Create(name string) (io.WriteCloser, error) {
-	url := urlJoin(s.prefix, name)
-	return s3util.Create(url, nil, nil)
+	return s.bucket.PutWriter(urlJoin(s.prefix, name), nil, s.config)
 }
 
 // Open opens the given filename.
 func (s S3Storage) Open(name string) (io.ReadCloser, error) {
-	url := urlJoin(s.prefix, name)
-	return s3util.Open(url, nil)
-}
-
-// List lists all files present in the file storage after the given prefix.
-func (s S3Storage) List(name string) (files []io.ReadCloser, err error) {
-	baseurl := urlJoin(s.prefix, name)
-	basedir, err := s3util.NewFile(baseurl, nil)
-	if err != nil {
-		return nil, err
-	}
-	infos, err := basedir.Readdir(-1)
-	if err != nil {
-		return nil, err
-	}
-	for _, info := range infos {
-		file, err := s3util.Open(urlJoin(s.prefix, info.Name()), nil)
-		if err != nil {
-			return files, nil
-		}
-		files = append(files, file)
-	}
-	return files, nil
+	r, _, err := s.bucket.GetReader(urlJoin(s.prefix, name), s.config)
+	return r, err
 }
 
 func urlJoin(strs ...string) string {
@@ -72,4 +66,16 @@ func urlJoin(strs ...string) string {
 		}
 	}
 	return strings.Join(ss, "/")
+}
+
+func envKeys() (s3.Keys, error) {
+	keys := s3.Keys{
+		AccessKey:     os.Getenv("AWS_ACCESS_KEY_ID"),
+		SecretKey:     os.Getenv("AWS_SECRET_ACCESS_KEY"),
+		SecurityToken: os.Getenv("AWS_SECURITY_TOKEN"),
+	}
+	if keys.AccessKey == "" || keys.SecretKey == "" {
+		return keys, fmt.Errorf("keys not set in environment: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY")
+	}
+	return keys, nil
 }

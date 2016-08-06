@@ -14,7 +14,6 @@ const CurrentVersion = "001"
 type Backend interface {
 	Create(name string) (io.WriteCloser, error)
 	Open(name string) (io.ReadCloser, error)
-	List(name string) ([]io.ReadCloser, error)
 }
 
 // Storage represents a storage facility.
@@ -62,7 +61,7 @@ func (s Storage) Backup(name, offset string, n int) (io.WriteCloser, error) {
 }
 
 // Restore returns a reader to restore the given backup.
-func (s Storage) Restore(name string) ([]io.ReadCloser, error) {
+func (s Storage) Restore(name string) (io.ReadCloser, error) {
 	filename := fmt.Sprintf("basebackup_%s/%s", CurrentVersion, name)
-	return s.b.List(filename)
+	return s.b.Open(filename)
 }
