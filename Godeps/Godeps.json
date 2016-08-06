@@ -15,14 +15,6 @@
 			"Rev": "fb01943a46775a863dcbb8f472f3b61a89359bd7"
 		},
 		{
-			"ImportPath": "github.com/kr/s3",
-			"Rev": "c070c8f9a8f0032d48f0d2a77d4e382788bd8a1d"
-		},
-		{
-			"ImportPath": "github.com/kr/s3/s3util",
-			"Rev": "c070c8f9a8f0032d48f0d2a77d4e382788bd8a1d"
-		},
-		{
 			"ImportPath": "github.com/lib/pq",
 			"Comment": "go1.0-cutoff-63-g11fc39a",
 			"Rev": "11fc39a580a008f1f39bb3d11d984fb34ed778d9"
@@ -40,6 +32,11 @@
 			"ImportPath": "github.com/pierrec/xxHash/xxHash32",
 			"Comment": "v0.1-4-g5a00444",
 			"Rev": "5a004441f897722c627870a981d02b29924215fa"
+		},
+		{
+			"ImportPath": "github.com/rlmcpherson/s3gof3r",
+			"Comment": "v0.5.0-3-gc70ac93",
+			"Rev": "c70ac93186ea905690463402cab5d3197acc636c"
 		}
 	]
 }
