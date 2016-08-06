@@ -2,7 +2,6 @@ package operator
 
 import (
 	"archive/tar"
-	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -10,14 +9,7 @@ import (
 	"syscall"
 )
 
-const (
-	// MaxPartitionSize represents the maximun size of a partition.
-	MaxPartitionSize = 1610612736
-	// MaxPartitionMembers represents the maximun numbers of menbers in a partition.
-	MaxPartitionMembers = int(MaxPartitionSize / 262144)
-)
-
-// File represents an archvie file.
+// File represents an archive file.
 type File struct {
 	Path     string
 	Rel      string
@@ -29,15 +21,13 @@ func (f *File) String() string {
 	return f.Path
 }
 
-// Archive represents an archive.
-type Archive struct {
-	members []*File
-}
+// Tape represents an archive.
+type Tape []*File
 
 // Copy writes a tar archive of all members.
-func (a *Archive) Copy(w io.WriteCloser) error {
+func (t Tape) Copy(w io.WriteCloser) error {
 	archive := tar.NewWriter(w)
-	for _, member := range a.members {
+	for _, member := range t {
 		file, err := os.Open(member.Path)
 		if err != nil {
 			// File might have been deleted, we can ignore it.
@@ -100,36 +90,24 @@ func walk(cluster string) (files []*File, err error) {
 	return files, err
 }
 
-// Partition creates multiple archives for the given directory.
-func Partition(cluster string) (archives []*Archive, err error) {
-	var size int64
-	var members []*File
+// Archive creates an archive for the given directory.
+func Archive(cluster string) (Tape, error) {
+	var archive []*File
 	files, err := walk(cluster)
 	if err != nil {
 		return nil, err
 	}
 	for _, file := range files {
-		if file.FileInfo.Size() > MaxPartitionSize {
-			// File is bigger than the max size of partition
-			return nil, errors.New("file too big for tar partition")
-		}
-		if (size+file.FileInfo.Size() >= MaxPartitionSize) ||
-			(len(members) >= MaxPartitionMembers) {
-			archives = append(archives, &Archive{members})
-			members = make([]*File, 0)
-			size = 0
-		}
-		members = append(members, file)
-		size += file.FileInfo.Size()
+		archive = append(archive, file)
 	}
-	return append(archives, &Archive{members}), nil
+	return archive, nil
 }
 
-// Unite untar a partition for the given directory.
-func Unite(cluster string, partition io.ReadCloser) error {
-	archive := tar.NewReader(partition)
+// Extract extracts the archive to the given directory.
+func Extract(cluster string, archive io.ReadCloser) error {
+	tr := tar.NewReader(archive)
 	for {
-		header, err := archive.Next()
+		header, err := tr.Next()
 		if err != nil {
 			if err == io.EOF {
 				// End of archive
@@ -147,7 +125,7 @@ func Unite(cluster string, partition io.ReadCloser) error {
 		if err != nil {
 			return err
 		}
-		if _, err = io.Copy(file, archive); err != nil {
+		if _, err = io.Copy(file, tr); err != nil {
 			return err
 		}
 	}

@@ -72,64 +72,49 @@ func (o *Operator) Backup(cluster string) error {
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 	backup, err := db.StartBackup()
 	if err != nil {
 		return err
 	}
 	defer db.StopBackup()
-	partitions, err := Partition(cluster)
+	archive, err := Archive(cluster)
 	if err != nil {
 		return err
 	}
-	for n, part := range partitions {
-		w, err := o.s.Backup(backup.Name, backup.Offset, n)
-		if err != nil {
-			return err
-		}
-		pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(10e6), lz4WritePipeline)
-		if err != nil {
-			return err
-		}
-		if err := part.Copy(pipe); err != nil {
-			return err
-		}
-		if err := pipe.Close(); err != nil {
-			return err
-		}
-	}
-	backup, err = db.StopBackup()
+	w, err := o.s.Backup(backup.Name, backup.Offset)
 	if err != nil {
 		return err
 	}
-	if err = db.Close(); err != nil {
+	pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(10e6), lz4WritePipeline)
+	if err != nil {
+		return err
+	}
+	defer pipe.Close()
+	if err := archive.Copy(pipe); err != nil {
 		return err
 	}
 	return nil
 }
 
 // Restore a named backup to the given cluster directory.
-func (o *Operator) Restore(cluster, name string) error {
+func (o *Operator) Restore(cluster, name, offset string) error {
 	if _, err := os.Stat(path.Join(cluster, "postmaster.pid")); err == nil {
 		return errors.New("attempt to overwrite a live data directory")
 	}
-	readers, err := o.s.Restore(name)
+	r, err := o.s.Restore(name, offset)
 	if err != nil {
 		return err
 	}
 	if err = os.MkdirAll(path.Dir(cluster), 0700); err != nil {
 		return err
 	}
-	for _, r := range readers {
-		pipe, err := pipeline.PipeRead(r, lz4ReadPipeline)
-		if err != nil {
-			return err
-		}
-		if err = Unite(cluster, pipe); err != nil {
-			return err
-		}
-		if err = pipe.Close(); err != nil {
-			return err
-		}
+	pipe, err := pipeline.PipeRead(r, lz4ReadPipeline)
+	if err != nil {
+		return err
 	}
-	return nil
+	if err = Extract(cluster, pipe); err != nil {
+		return err
+	}
+	return pipe.Close()
 }
