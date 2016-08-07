@@ -22,8 +22,8 @@ Law make use of environment-variable, the base one are:
 
 S3 storage might requires one or more of theses variables:
 
- - ``AWS_ACCESS_KEY``: An AWS access key.
- - ``AWS_SECRET_KEY``: An AWS secret key.
+ - ``AWS_ACCESS_KEY_ID``: An AWS access key.
+ - ``AWS_SECRET_ACCESS_KEY``: An AWS secret key.
  - ``AWS_SECURITY_TOKEN``: An AWS STS Token.
 
 Law has 4 subcommands :
