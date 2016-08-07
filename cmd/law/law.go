@@ -66,6 +66,7 @@ func (cmd *walFetch) Run() {
 
 type backupPush struct {
 	cluster *string
+	rate    *int
 }
 
 func (cmd *backupPush) Name() string {
@@ -74,6 +75,7 @@ func (cmd *backupPush) Name() string {
 
 func (cmd *backupPush) DefineFlags(fs *flag.FlagSet) {
 	cmd.cluster = fs.String("cluster", "", "Path of cluster directory")
+	cmd.rate = fs.Int("rate-limit", 0, "Rate-limit i/o")
 }
 
 func (cmd *backupPush) Run() {
@@ -84,7 +86,7 @@ func (cmd *backupPush) Run() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err = o.Backup(*cmd.cluster); err != nil {
+	if err = o.Backup(*cmd.cluster, *cmd.rate); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -23,13 +23,9 @@ func lz4ReadPipeline(r io.ReadCloser) (io.ReadCloser, error) {
 // rateLimitWritePipeline returns a WritePipeline that will rate-limit write I/O.
 func rateLimitWritePipeline(size int) pipeline.WritePipeline {
 	return func(w io.WriteCloser) (io.WriteCloser, error) {
-		return ratio.RateLimitedWriter(w, size, time.Second), nil
-	}
-}
-
-// rateLimitReadPipeline returns a ReadPipeline that will rate-limit write I/O.
-func rateLimitReadPipeline(size int) pipeline.ReadPipeline {
-	return func(r io.ReadCloser) (io.ReadCloser, error) {
-		return ratio.RateLimitedReader(r, size, time.Second), nil
+		if size > 0 {
+			return ratio.RateLimitedWriter(w, size, time.Second), nil
+		}
+		return w, nil
 	}
 }

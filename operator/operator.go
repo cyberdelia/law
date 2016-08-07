@@ -56,7 +56,7 @@ func (o *Operator) Archive(name string) error {
 	if err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(10e6), lz4WritePipeline)
+	pipe, err := pipeline.PipeWrite(w, lz4WritePipeline)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (o *Operator) Archive(name string) error {
 }
 
 // Backup backups the given cluster directory.
-func (o *Operator) Backup(cluster string) error {
+func (o *Operator) Backup(cluster string, rate int) error {
 	db, err := NewDatabase(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func (o *Operator) Backup(cluster string) error {
 	if err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(10e6), lz4WritePipeline)
+	pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(rate), lz4WritePipeline)
 	if err != nil {
 		return err
 	}
