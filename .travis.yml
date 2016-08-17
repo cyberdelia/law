@@ -3,7 +3,7 @@ sudo: false
 go:
   - 1.7
 env:
-  - DATABASE_URL=postgres://postgres@localhost
+  - DATABASE_URL=postgres://postgres@localhost?sslmode=disable
 services:
   - postgresql
 script: go list ./... | grep -v vendor | xargs -n1 go vet && go test -race -cover ./...
