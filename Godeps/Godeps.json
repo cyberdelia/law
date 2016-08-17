@@ -16,13 +16,13 @@
 		},
 		{
 			"ImportPath": "github.com/lib/pq",
-			"Comment": "go1.0-cutoff-63-g11fc39a",
-			"Rev": "11fc39a580a008f1f39bb3d11d984fb34ed778d9"
+			"Comment": "go1.0-cutoff-111-g80f8150",
+			"Rev": "80f8150043c80fb52dee6bc863a709cdac7ec8f8"
 		},
 		{
 			"ImportPath": "github.com/lib/pq/oid",
-			"Comment": "go1.0-cutoff-63-g11fc39a",
-			"Rev": "11fc39a580a008f1f39bb3d11d984fb34ed778d9"
+			"Comment": "go1.0-cutoff-111-g80f8150",
+			"Rev": "80f8150043c80fb52dee6bc863a709cdac7ec8f8"
 		},
 		{
 			"ImportPath": "github.com/pierrec/lz4",
