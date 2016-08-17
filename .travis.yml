@@ -1,12 +1,9 @@
 language: go
-sudo: required
+sudo: false
+go:
+  - 1.7
 env:
   - DATABASE_URL=postgres://postgres@localhost
 services:
   - postgresql
-before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -qq liblzo2-dev
-before_script:
- - go get golang.org/x/tools/cmd/cover
 script: go list ./... | grep -v vendor | xargs -n1 go vet && go test -race -cover ./...
