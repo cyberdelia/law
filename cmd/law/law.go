@@ -9,6 +9,10 @@ import (
 	"github.com/cyberdelia/law/operator"
 )
 
+func init() {
+	log.SetPrefix("law: ")
+}
+
 type walPush struct {
 	segment *string
 }
@@ -23,8 +27,9 @@ func (cmd *walPush) DefineFlags(fs *flag.FlagSet) {
 
 func (cmd *walPush) Run() {
 	if *cmd.segment == "" {
-		log.Fatalln("law: wal segment required")
+		log.Fatalln("wal segment required")
 	}
+	log.Printf("uploading wal segment %s", *cmd.segment)
 	o, err := operator.NewOperator(*storage)
 	if err != nil {
 		log.Fatal(err)
@@ -50,11 +55,12 @@ func (cmd *walFetch) DefineFlags(fs *flag.FlagSet) {
 
 func (cmd *walFetch) Run() {
 	if *cmd.segment == "" {
-		log.Fatalln("law: wal segment required")
+		log.Fatalln("wal segment required")
 	}
 	if *cmd.destination == "" {
-		log.Fatalln("law: wal destination required")
+		log.Fatalln("wal destination required")
 	}
+	log.Printf("downloading wal segment %s", *cmd.segment)
 	o, err := operator.NewOperator(*storage)
 	if err != nil {
 		log.Fatal(err)
@@ -80,7 +86,7 @@ func (cmd *backupPush) DefineFlags(fs *flag.FlagSet) {
 
 func (cmd *backupPush) Run() {
 	if *cmd.cluster == "" {
-		log.Fatalln("law: cluster directory required")
+		log.Fatalln("cluster directory required")
 	}
 	o, err := operator.NewOperator(*storage)
 	if err != nil {
