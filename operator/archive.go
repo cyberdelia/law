@@ -69,7 +69,11 @@ func walk(cluster string) (files []*File, err error) {
 			return err
 		}
 		if strings.Contains(path, "pg_xlog") && !info.IsDir() {
-			// We don't want to capture WAL files but we want the pg_xlog directory
+			// We don't want to archive WAL files but we want the pg_xlog directory
+			return nil
+		}
+		if strings.Contains(path, "pg_log") && !info.IsDir() {
+			// We don't want to archive log files but we want the pg_log directory
 			return nil
 		}
 		if info.Name() == "postgresql.conf" || info.Name() == "postmaster.pid" {
