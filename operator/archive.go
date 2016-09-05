@@ -36,11 +36,15 @@ func (t Tape) Copy(w io.WriteCloser) error {
 			}
 			return err
 		}
-		info, err := file.Stat()
+		info, err := os.Lstat(member.Path)
 		if err != nil {
 			return err
 		}
-		header, err := tar.FileInfoHeader(info, "")
+		link, err := filepath.EvalSymlinks(member.Path)
+		if err != nil {
+			return err
+		}
+		header, err := tar.FileInfoHeader(info, link)
 		if err != nil {
 			return err
 		}
@@ -48,11 +52,12 @@ func (t Tape) Copy(w io.WriteCloser) error {
 		if err = archive.WriteHeader(header); err != nil {
 			return err
 		}
-		if !info.IsDir() {
-			if _, err = io.Copy(archive, file); err != nil {
-				if err != tar.ErrWriteTooLong {
-					return err
-				}
+		if !info.Mode().IsRegular() {
+			continue
+		}
+		if _, err = io.Copy(archive, file); err != nil {
+			if err != tar.ErrWriteTooLong {
+				return err
 			}
 		}
 		if err := file.Close(); err != nil {
@@ -125,6 +130,10 @@ func Extract(cluster string, archive io.ReadCloser) error {
 			os.MkdirAll(filename, info.Mode())
 			continue
 		}
+		if isSymlink(info) {
+			os.Symlink(header.Linkname, filename)
+			continue
+		}
 		file, err := createFile(filename, info.Mode())
 		if err != nil {
 			return err
@@ -141,6 +150,10 @@ func createFile(name string, mode os.FileMode) (*os.File, error) {
 		return nil, err
 	}
 	return os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
+}
+
+func isSymlink(fi os.FileInfo) bool {
+	return fi.Mode()&os.ModeSymlink == os.ModeSymlink
 }
 
 func isNotExist(err error) bool {

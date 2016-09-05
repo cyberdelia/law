@@ -56,12 +56,12 @@ func (s Storage) Unarchive(name string) (io.ReadCloser, error) {
 
 // Backup returns a writer to archive the given backup.
 func (s Storage) Backup(name, offset string) (io.WriteCloser, error) {
-	filename := fmt.Sprintf("basebackup_%s/base_%s_%s.tar.lz4", CurrentVersion, name, offset)
+	filename := fmt.Sprintf("basebackup_%s/%s_%s.tar.lz4", CurrentVersion, name, offset)
 	return s.b.Create(filename)
 }
 
 // Restore returns a reader to restore the given backup.
 func (s Storage) Restore(name, offset string) (io.ReadCloser, error) {
-	filename := fmt.Sprintf("basebackup_%s/base_%s_%s.tar.lz4", CurrentVersion, name, offset)
+	filename := fmt.Sprintf("basebackup_%s/%s_%s.tar.lz4", CurrentVersion, name, offset)
 	return s.b.Open(filename)
 }
