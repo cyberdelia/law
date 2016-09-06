@@ -16,7 +16,9 @@ import (
 	"time"
 )
 
-var regionMatcher = regexp.MustCompile("s3-([a-z0-9-]+).amazonaws.com")
+const versionParam = "versionId"
+
+var regionMatcher = regexp.MustCompile("s3[-.]([a-z0-9-]+).amazonaws.com([.a-z0-9]*)")
 
 // S3 contains the domain or endpoint of an S3-compatible service and
 // the authentication keys for that service.
@@ -103,6 +105,8 @@ func (s *S3) Bucket(name string) *Bucket {
 // Header data from the downloaded object is also returned, useful for reading object metadata.
 // DefaultConfig is used if c is nil
 // Callers should call Close on r to ensure that all resources are released.
+//
+// To specify an object version in a versioned bucket, the version ID may be included in the path as a url parameter. See http://docs.aws.amazon.com/AmazonS3/latest/dev/RetrievingObjectVersions.html
 func (b *Bucket) GetReader(path string, c *Config) (r io.ReadCloser, h http.Header, err error) {
 	if path == "" {
 		return nil, nil, errors.New("empty path requested")
@@ -136,24 +140,38 @@ func (b *Bucket) PutWriter(path string, h http.Header, c *Config) (w io.WriteClo
 }
 
 // url returns a parsed url to the given path. c must not be nil
-// Note: Urls containing some special characters will fail due to net/http bug.
-// See https://code.google.com/p/go/issues/detail?id=5684
 func (b *Bucket) url(bPath string, c *Config) (*url.URL, error) {
-	u, err := url.Parse(bPath)
+
+	// parse versionID parameter from path, if included
+	// See https://github.com/rlmcpherson/s3gof3r/issues/84 for rationale
+	purl, err := url.Parse(bPath)
 	if err != nil {
 		return nil, err
 	}
-	u.Scheme = c.Scheme
-	// handling for bucket names containing periods
+	var vals url.Values
+	if v := purl.Query().Get(versionParam); v != "" {
+		vals = make(url.Values)
+		vals.Add(versionParam, v)
+		bPath = strings.Split(bPath, "?")[0] // remove versionID from path
+	}
+
+	// handling for bucket names containing periods / explicit PathStyle addressing
 	// http://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html for details
 	if strings.Contains(b.Name, ".") || c.PathStyle {
-		u.Host = b.S3.Domain
-		u.Path = path.Clean(fmt.Sprintf("/%s/%s", b.Name, u.Path))
+		return &url.URL{
+			Host:     b.S3.Domain,
+			Scheme:   c.Scheme,
+			Path:     path.Clean(fmt.Sprintf("/%s/%s", b.Name, bPath)),
+			RawQuery: vals.Encode(),
+		}, nil
 	} else {
-		u.Host = fmt.Sprintf("%s.%s", b.Name, b.S3.Domain)
-		u.Path = path.Clean(fmt.Sprintf("/%s", u.Path))
+		return &url.URL{
+			Scheme:   c.Scheme,
+			Path:     path.Clean(fmt.Sprintf("/%s", bPath)),
+			Host:     path.Clean(fmt.Sprintf("%s.%s", b.Name, b.S3.Domain)),
+			RawQuery: vals.Encode(),
+		}, nil
 	}
-	return u, nil
 }
 
 func (b *Bucket) conf() *Config {

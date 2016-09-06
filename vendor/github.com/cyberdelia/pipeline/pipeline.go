@@ -26,7 +26,7 @@ func (pi *pipe) Read(p []byte) (int, error) {
 }
 
 func (pi *pipe) Close() error {
-	for i := len(pi.pipes) - 1; i >= 0; i = i - 1 {
+	for i := len(pi.pipes) - 1; i > 0; i = i - 1 {
 		pipe := pi.pipes[i].(io.Closer)
 		if err := pipe.Close(); err != nil {
 			return err
@@ -38,10 +38,9 @@ func (pi *pipe) Close() error {
 // PipeWrite returns a WriteCloser that's the logical concatenation of the provided input
 // writer and the given WritePipeline.
 func PipeWrite(w io.WriteCloser, pipelines ...WritePipeline) (io.WriteCloser, error) {
-	var pipes []interface{}
-	pipes = append(pipes, w)
+	pipes := []interface{}{w}
 	for _, pipeline := range pipelines {
-		w, err := pipeline(w)
+		w, err := pipeline(pipes[len(pipes)-1].(io.WriteCloser))
 		if err != nil {
 			return nil, err
 		}
@@ -56,10 +55,9 @@ func PipeWrite(w io.WriteCloser, pipelines ...WritePipeline) (io.WriteCloser, er
 // PipeRead returns a ReadCloser that's the logical concatenation of the provided input
 // reader and the given ReadPipeline.
 func PipeRead(r io.ReadCloser, pipelines ...ReadPipeline) (io.ReadCloser, error) {
-	var pipes []interface{}
-	pipes = append(pipes, r)
+	pipes := []interface{}{r}
 	for _, pipeline := range pipelines {
-		r, err := pipeline(r)
+		r, err := pipeline(pipes[len(pipes)-1].(io.ReadCloser))
 		if err != nil {
 			return nil, err
 		}

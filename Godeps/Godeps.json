@@ -8,11 +8,11 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/cyberdelia/pipeline",
-			"Rev": "07dfcb3a8d888ef88eac0efc510536e1c0fd2fdf"
+			"Rev": "9590e9faaddedd5e5dc9c29475e38da85344d126"
 		},
 		{
 			"ImportPath": "github.com/cyberdelia/ratio",
-			"Rev": "fb01943a46775a863dcbb8f472f3b61a89359bd7"
+			"Rev": "3b76052eb25068ccea02ad73698a076acbd2ae4e"
 		},
 		{
 			"ImportPath": "github.com/lib/pq",
@@ -35,8 +35,8 @@
 		},
 		{
 			"ImportPath": "github.com/rlmcpherson/s3gof3r",
-			"Comment": "v0.5.0-3-gc70ac93",
-			"Rev": "c70ac93186ea905690463402cab5d3197acc636c"
+			"Comment": "v0.5.0-16-g2a8e00b",
+			"Rev": "2a8e00b3728288727f88eb49aa4f84aca0c69874"
 		}
 	]
 }

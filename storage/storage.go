@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -35,7 +34,7 @@ func NewStorage(uri string) (*Storage, error) {
 	case "s3":
 		b = NewS3Storage(u)
 	default:
-		return nil, errors.New("unsupported storage")
+		return nil, fmt.Errorf("unsupported storage : %s", u.Scheme)
 	}
 	return &Storage{
 		b: b,

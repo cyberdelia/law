@@ -86,6 +86,7 @@ func (o *Operator) Backup(cluster string, rate int) error {
 	if err != nil {
 		return err
 	}
+	defer w.Close()
 	pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(rate), lz4WritePipeline)
 	if err != nil {
 		return err
@@ -106,6 +107,7 @@ func (o *Operator) Restore(cluster, name, offset string) error {
 	if err != nil {
 		return err
 	}
+	defer r.Close()
 	if err = os.MkdirAll(path.Dir(cluster), 0700); err != nil {
 		return err
 	}
