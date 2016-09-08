@@ -37,6 +37,7 @@ func (cmd *walPush) Run() {
 	if err = o.Archive(*cmd.segment); err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("uploaded wal segment %s", *cmd.segment)
 }
 
 type walFetch struct {
@@ -68,6 +69,7 @@ func (cmd *walFetch) Run() {
 	if err = o.Unarchive(*cmd.segment, *cmd.destination); err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("downloaded wal segment %s", *cmd.segment)
 }
 
 type backupPush struct {
@@ -88,6 +90,7 @@ func (cmd *backupPush) Run() {
 	if *cmd.cluster == "" {
 		log.Fatalln("cluster directory required")
 	}
+	log.Printf("backuping %s", *cmd.cluster)
 	o, err := operator.NewOperator(*storage)
 	if err != nil {
 		log.Fatal(err)
@@ -95,6 +98,7 @@ func (cmd *backupPush) Run() {
 	if err = o.Backup(*cmd.cluster, *cmd.rate); err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("backuped %s", *cmd.cluster)
 }
 
 type backupFetch struct {
@@ -120,6 +124,7 @@ func (cmd *backupFetch) Run() {
 	if *cmd.name == "" {
 		log.Fatalln("law: name of backup required")
 	}
+	log.Printf("restoring backup %s:%s to %s", *cmd.name, *cmd.offset, *cmd.cluster)
 	o, err := operator.NewOperator(*storage)
 	if err != nil {
 		log.Fatal(err)
@@ -127,6 +132,7 @@ func (cmd *backupFetch) Run() {
 	if err = o.Restore(*cmd.cluster, *cmd.name, *cmd.offset); err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("restored backup %s:%s to %s", *cmd.name, *cmd.offset, *cmd.cluster)
 }
 
 var (

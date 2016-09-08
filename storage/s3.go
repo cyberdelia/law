@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -31,13 +32,14 @@ func NewS3Storage(u *url.URL) *S3Storage {
 	if len(parts) > 1 {
 		prefix = parts[1]
 	}
+	v := u.Query()
 	return &S3Storage{
 		prefix: prefix,
 		bucket: storage.Bucket(parts[0]),
 		config: &s3.Config{
-			Concurrency: 10,
-			PartSize:    20971520,
-			NTry:        10,
+			Concurrency: mustParseInt(v, "concurrency", 10),
+			PartSize:    mustParseInt64(v, "part_size", 20000000),
+			NTry:        mustParseInt(v, "retry", 10),
 			Md5Check:    false,
 			Scheme:      "https",
 			Client:      s3.ClientWithTimeout(5 * time.Second),
@@ -78,4 +80,20 @@ func envKeys() (s3.Keys, error) {
 		return keys, fmt.Errorf("keys not set in environment: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY")
 	}
 	return keys, nil
+}
+
+func mustParseInt(q url.Values, key string, value int) int {
+	v, err := strconv.ParseInt(q.Get(key), 10, 64)
+	if err != nil {
+		return value
+	}
+	return int(v)
+}
+
+func mustParseInt64(q url.Values, key string, value int64) int64 {
+	v, err := strconv.ParseInt(q.Get(key), 10, 64)
+	if err != nil {
+		return value
+	}
+	return v
 }
