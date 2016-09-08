@@ -130,9 +130,9 @@ func (cmd *backupFetch) Run() {
 }
 
 var (
-	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
-	memprofile = flag.String("memprofile", "", "write memory profile to this file")
-	storage    = flag.String("storage", os.Getenv("STORAGE_URL"), "storage source name")
+	cpuprofile = flag.String("cpuprofile", "", "CPU profile filepath")
+	memprofile = flag.String("memprofile", "", "Memory profile filepath")
+	storage    = flag.String("storage", os.Getenv("STORAGE_URL"), "Storage Source Name")
 )
 
 func main() {
