@@ -25,15 +25,6 @@
 			"Rev": "80f8150043c80fb52dee6bc863a709cdac7ec8f8"
 		},
 		{
-			"ImportPath": "github.com/pierrec/lz4",
-			"Rev": "383c0d87b5dd7c090d3cddefe6ff0c2ffbb88470"
-		},
-		{
-			"ImportPath": "github.com/pierrec/xxHash/xxHash32",
-			"Comment": "v0.1-4-g5a00444",
-			"Rev": "5a004441f897722c627870a981d02b29924215fa"
-		},
-		{
 			"ImportPath": "github.com/rlmcpherson/s3gof3r",
 			"Comment": "v0.5.0-16-g2a8e00b",
 			"Rev": "2a8e00b3728288727f88eb49aa4f84aca0c69874"

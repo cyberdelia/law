@@ -36,7 +36,7 @@ func (o *Operator) Unarchive(name string, dest string) error {
 	if err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeRead(r, lz4ReadPipeline)
+	pipe, err := pipeline.PipeRead(r, gzipReadPipeline)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (o *Operator) Archive(name string) error {
 	if err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeWrite(w, lz4WritePipeline)
+	pipe, err := pipeline.PipeWrite(w, gzipWritePipeline)
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (o *Operator) Backup(cluster string, rate int) error {
 		return err
 	}
 	defer w.Close()
-	pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(rate), lz4WritePipeline)
+	pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(rate), gzipWritePipeline)
 	if err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func (o *Operator) Restore(cluster, name, offset string) error {
 	if err = os.MkdirAll(path.Dir(cluster), 0700); err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeRead(r, lz4ReadPipeline)
+	pipe, err := pipeline.PipeRead(r, gzipReadPipeline)
 	if err != nil {
 		return err
 	}

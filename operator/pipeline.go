@@ -1,23 +1,22 @@
 package operator
 
 import (
+	"compress/gzip"
 	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/cyberdelia/pipeline"
 	"github.com/cyberdelia/ratio"
-	"github.com/pierrec/lz4"
 )
 
-// lz4WritePipeline returns a WritePipeline that will compress data.
-func lz4WritePipeline(w io.WriteCloser) (io.WriteCloser, error) {
-	return lz4.NewWriter(w), nil
+// gzipWritePipeline returns a WritePipeline that compress data using GZIP.
+func gzipWritePipeline(w io.WriteCloser) (io.WriteCloser, error) {
+	return gzip.NewWriter(w), nil
 }
 
-// lz4ReadPipeline returns a ReadPipeline that will decompress data.
-func lz4ReadPipeline(r io.ReadCloser) (io.ReadCloser, error) {
-	return ioutil.NopCloser(lz4.NewReader(r)), nil
+// gzipReadPipeline returns a ReadPipeline that decompress data using GZIP.
+func gzipReadPipeline(r io.ReadCloser) (io.ReadCloser, error) {
+	return gzip.NewReader(r)
 }
 
 // rateLimitWritePipeline returns a WritePipeline that will rate-limit write I/O.

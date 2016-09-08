@@ -43,24 +43,24 @@ func NewStorage(uri string) (*Storage, error) {
 
 // Archive returns a writer to archive the given wal segment.
 func (s Storage) Archive(name string) (io.WriteCloser, error) {
-	filename := fmt.Sprintf("law_%s/%s.lz4", CurrentVersion, name)
+	filename := fmt.Sprintf("law_%s/%s.gz", CurrentVersion, name)
 	return s.b.Create(filename)
 }
 
 // Unarchive returns a reader to restore the given wal segment.
 func (s Storage) Unarchive(name string) (io.ReadCloser, error) {
-	filename := fmt.Sprintf("law_%s/%s.lz4", CurrentVersion, name)
+	filename := fmt.Sprintf("law_%s/%s.gz", CurrentVersion, name)
 	return s.b.Open(filename)
 }
 
 // Backup returns a writer to archive the given backup.
 func (s Storage) Backup(name, offset string) (io.WriteCloser, error) {
-	filename := fmt.Sprintf("basebackup_%s/%s_%s.tar.lz4", CurrentVersion, name, offset)
+	filename := fmt.Sprintf("basebackup_%s/%s_%s.tar.gz", CurrentVersion, name, offset)
 	return s.b.Create(filename)
 }
 
 // Restore returns a reader to restore the given backup.
 func (s Storage) Restore(name, offset string) (io.ReadCloser, error) {
-	filename := fmt.Sprintf("basebackup_%s/%s_%s.tar.lz4", CurrentVersion, name, offset)
+	filename := fmt.Sprintf("basebackup_%s/%s_%s.tar.gz", CurrentVersion, name, offset)
 	return s.b.Open(filename)
 }
