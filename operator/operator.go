@@ -36,14 +36,16 @@ func (o *Operator) Unarchive(name string, dest string) error {
 	if err != nil {
 		return err
 	}
+	defer r.Close()
 	pipe, err := pipeline.PipeRead(r, gzipReadPipeline)
 	if err != nil {
 		return err
 	}
+	defer pipe.Close()
 	if _, err = io.Copy(file, pipe); err != nil {
 		return err
 	}
-	return pipe.Close()
+	return nil
 }
 
 // Archive archives the given wal segment.
@@ -56,14 +58,16 @@ func (o *Operator) Archive(name string) error {
 	if err != nil {
 		return err
 	}
+	defer w.Close()
 	pipe, err := pipeline.PipeWrite(w, gzipWritePipeline)
 	if err != nil {
 		return err
 	}
+	defer pipe.Close()
 	if _, err = io.Copy(pipe, file); err != nil {
 		return err
 	}
-	return pipe.Close()
+	return nil
 }
 
 // Backup backups the given cluster directory.
@@ -92,10 +96,7 @@ func (o *Operator) Backup(cluster string, rate int) error {
 		return err
 	}
 	defer pipe.Close()
-	if err := archive.Copy(pipe); err != nil {
-		return err
-	}
-	return nil
+	return archive.Copy(pipe)
 }
 
 // Restore a named backup to the given cluster directory.
@@ -115,8 +116,6 @@ func (o *Operator) Restore(cluster, name, offset string) error {
 	if err != nil {
 		return err
 	}
-	if err = Extract(cluster, pipe); err != nil {
-		return err
-	}
-	return pipe.Close()
+	defer pipe.Close()
+	return Extract(cluster, pipe)
 }

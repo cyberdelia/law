@@ -301,7 +301,6 @@ func (g *getter) Close() error {
 		return g.err
 	}
 	if g.bytesRead != g.contentLen {
-		panic(fmt.Sprintf("read error: %d bytes read. expected: %d", g.bytesRead, g.contentLen))
 		return fmt.Errorf("read error: %d bytes read. expected: %d", g.bytesRead, g.contentLen)
 	}
 	if g.c.Md5Check {
