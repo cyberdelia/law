@@ -132,12 +132,13 @@ func (cmd *backupFetch) Run() {
 var (
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 	memprofile = flag.String("memprofile", "", "write memory profile to this file")
-	storage    = flag.String("storage", os.Getenv("STORAGE_URL"), "storage URL")
+	storage    = flag.String("storage", os.Getenv("STORAGE_URL"), "storage source name")
 )
 
 func main() {
 	log.SetFlags(0)
 	flag.Parse()
+
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
@@ -146,7 +147,13 @@ func main() {
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
 	}
+
+	if *storage == "" {
+		log.Fatalln("storage source name required")
+	}
+
 	Parse(new(walPush), new(walFetch), new(backupPush), new(backupFetch))
+
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
 		if err != nil {
