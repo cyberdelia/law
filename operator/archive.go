@@ -36,6 +36,7 @@ func (t Tape) Copy(w io.WriteCloser) error {
 			}
 			return err
 		}
+		defer file.Close()
 		info, err := os.Lstat(member.Path)
 		if err != nil {
 			return err
@@ -59,9 +60,6 @@ func (t Tape) Copy(w io.WriteCloser) error {
 			if err != tar.ErrWriteTooLong {
 				return err
 			}
-		}
-		if err := file.Close(); err != nil {
-			return err
 		}
 	}
 	return archive.Close()
@@ -138,6 +136,7 @@ func Extract(cluster string, archive io.ReadCloser) error {
 		if err != nil {
 			return err
 		}
+		defer file.Close()
 		if _, err = io.Copy(file, tr); err != nil {
 			return err
 		}
