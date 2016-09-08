@@ -11,7 +11,7 @@ import (
 
 // gzipWritePipeline returns a WritePipeline that compress data using GZIP.
 func gzipWritePipeline(w io.WriteCloser) (io.WriteCloser, error) {
-	return gzip.NewWriter(w), nil
+	return gzip.NewWriterLevel(w, gzip.BestSpeed)
 }
 
 // gzipReadPipeline returns a ReadPipeline that decompress data using GZIP.

@@ -27,6 +27,7 @@ type Tape []*File
 // Copy writes a tar archive of all members.
 func (t Tape) Copy(w io.WriteCloser) error {
 	archive := tar.NewWriter(w)
+	defer archive.Close()
 	for _, member := range t {
 		file, err := os.Open(member.Path)
 		if err != nil {
@@ -36,7 +37,6 @@ func (t Tape) Copy(w io.WriteCloser) error {
 			}
 			return err
 		}
-		defer file.Close()
 		info, err := os.Lstat(member.Path)
 		if err != nil {
 			return err
@@ -50,7 +50,7 @@ func (t Tape) Copy(w io.WriteCloser) error {
 			return err
 		}
 		header.Name = member.Rel
-		if err = archive.WriteHeader(header); err != nil {
+		if err := archive.WriteHeader(header); err != nil {
 			return err
 		}
 		if !info.Mode().IsRegular() {
@@ -61,8 +61,11 @@ func (t Tape) Copy(w io.WriteCloser) error {
 				return err
 			}
 		}
+		if err := file.Close(); err != nil {
+			return err
+		}
 	}
-	return archive.Close()
+	return nil
 }
 
 func walk(cluster string) (files []*File, err error) {
