@@ -74,8 +74,8 @@ func walk(cluster string) (files []*File, err error) {
 			// An error occured, stop processing
 			return err
 		}
-		if strings.Contains(path, "pg_xlog") && !info.IsDir() {
-			// We don't want to archive WAL files but we want the pg_xlog directory
+		if (strings.Contains(path, "pg_xlog") || strings.Contains(path, "pg_wal")) && !info.IsDir() {
+			// We don't want to archive WAL files but we want the pg_xlog/pg_wal directory
 			return nil
 		}
 		if strings.Contains(path, "pg_log") && !info.IsDir() {
