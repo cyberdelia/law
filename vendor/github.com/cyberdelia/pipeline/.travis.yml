@@ -1,6 +1,0 @@
-language: go
-sudo: false
-before_script:
-  - go get golang.org/x/tools/cmd/cover
-  - go get golang.org/x/tools/cmd/vet
-script:  go vet ./... && go test -race -cover ./...
