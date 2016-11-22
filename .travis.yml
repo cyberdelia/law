@@ -1,9 +1,10 @@
 language: go
-sudo: false
+sudo: required
+dist: trusty
 go:
   - 1.7
 env:
   - DATABASE_URL=postgres://postgres@localhost?sslmode=disable
-services:
-  - postgresql
-script: go list ./... | grep -v vendor | xargs -n1 go vet && go test -race -cover ./...
+addons:
+  postgresql: "9.5"
+script: go list ./... | grep -v vendor | xargs -n1 go vet && go test -race -short -cover ./...
