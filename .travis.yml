@@ -7,4 +7,6 @@ env:
   - DATABASE_URL=postgres://postgres@localhost?sslmode=disable
 addons:
   postgresql: "9.5"
-script: go list ./... | grep -v vendor | xargs -n1 go vet && go test -race -short -cover ./...
+before_script:
+  - go get -u github.com/kardianos/govendor
+script: govendor vet +local && govendor test +local -short -race -cover ./...
