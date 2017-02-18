@@ -74,10 +74,9 @@ func walk(cluster string) (files []*File, err error) {
 			// An error occured, stop processing
 			return err
 		}
-		if (strings.Contains(path, "pg_xlog") || strings.Contains(path, "pg_wal") ||
-			strings.Contains(path, "pg_log")) && !info.IsDir() {
-			// We don't want to archive WAL files, nor log files but we want the
-			// pg_xlog/pg_wal and pg_log directory
+		if keepEmpty(path) && !info.IsDir() {
+			// We don't want to archive WAL files, nor temporary files, nor log
+			// files but we want to keep the directory that contains them.
 			return nil
 		}
 		if info.Name() == "postgresql.conf" || info.Name() == "postmaster.pid" {
@@ -166,4 +165,14 @@ func isNotExist(err error) bool {
 		err = pe.Err
 	}
 	return err == syscall.ENOENT || err == os.ErrNotExist
+}
+
+func keepEmpty(path string) bool {
+	whitelist := []string{"pg_xlog", "pg_log", "pg_replslot", "pg_wal", "pgsql_tmp", "pg_stat_tmp"}
+	for _, name := range whitelist {
+		if strings.Contains(path, name) {
+			return true
+		}
+	}
+	return false
 }
