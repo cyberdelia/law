@@ -3,6 +3,7 @@ package storage
 import (
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"strconv"
@@ -49,7 +50,9 @@ func NewS3Storage(u *url.URL) *S3Storage {
 
 // Create creates a new file based on the given filename.
 func (s S3Storage) Create(name string) (io.WriteCloser, error) {
-	return s.bucket.PutWriter(urlJoin(s.prefix, name), nil, s.config)
+	return s.bucket.PutWriter(urlJoin(s.prefix, name), http.Header{
+		"x-amz-server-side-encryption": []string{"AES256"},
+	}, s.config)
 }
 
 // Open opens the given filename.
