@@ -7,6 +7,9 @@ import (
 )
 
 func TestVersion(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
 	db, err := NewDatabase(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		t.Fatal(err)
