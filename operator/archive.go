@@ -136,10 +136,11 @@ func Extract(cluster string, archive io.ReadCloser) error {
 		if err != nil {
 			return err
 		}
-		defer file.Close()
 		if _, err = io.Copy(file, tr); err != nil {
+			file.Close()
 			return err
 		}
+		file.Close()
 	}
 	return nil
 }
