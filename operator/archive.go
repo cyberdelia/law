@@ -74,11 +74,6 @@ func walk(cluster string) (files []*File, err error) {
 			// An error occured, stop processing
 			return err
 		}
-		if keepEmpty(path) && !info.IsDir() {
-			// We don't want to archive WAL files, nor temporary files, nor log
-			// files but we want to keep the directory that contains them.
-			return nil
-		}
 		if info.Name() == "postgresql.conf" || info.Name() == "postmaster.pid" {
 			// Ignore configuration and pid files
 			return nil
@@ -92,6 +87,11 @@ func walk(cluster string) (files []*File, err error) {
 			Rel:      rel,
 			FileInfo: info,
 		})
+		if keepEmpty(path) && info.IsDir() {
+			// We don't want to archive WAL files, nor temporary files, nor log
+			// files but we want to keep the directory that contains them.
+			return filepath.SkipDir
+		}
 		return nil
 	})
 	return files, err
