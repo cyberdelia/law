@@ -82,40 +82,55 @@ func (o *Operator) Backup(cluster string, rate int) error {
 		return err
 	}
 	defer db.StopBackup()
-	archive, err := Archive(cluster)
+	partitions, err := Partition(cluster)
 	if err != nil {
 		return err
 	}
-	w, err := o.s.Backup(backup.Name, backup.Offset)
-	if err != nil {
-		return err
+	for n, part := range partitions {
+		w, err := o.s.Backup(backup.Name, backup.Offset, n)
+		if err != nil {
+			return err
+		}
+		pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(rate), lzoWritePipeline)
+		if err != nil {
+			return err
+		}
+		if err := part.Copy(pipe); err != nil {
+			return err
+		}
+		if err := pipe.Close(); err != nil {
+			return err
+		}
+		if err := w.Close(); err != nil {
+			return err
+		}
 	}
-	defer w.Close()
-	pipe, err := pipeline.PipeWrite(w, rateLimitWritePipeline(rate), lzoWritePipeline)
-	if err != nil {
-		return err
-	}
-	defer pipe.Close()
-	return archive.Copy(pipe)
+	return nil
 }
 
 // Restore a named backup to the given cluster directory.
-func (o *Operator) Restore(cluster, name, offset string) error {
+func (o *Operator) Restore(cluster, name string) error {
 	if _, err := os.Stat(path.Join(cluster, "postmaster.pid")); err == nil {
 		return errors.New("attempt to overwrite a live data directory")
 	}
-	r, err := o.s.Restore(name, offset)
+	rs, err := o.s.Restore(name)
 	if err != nil {
 		return err
 	}
-	defer r.Close()
 	if err = os.MkdirAll(path.Dir(cluster), 0700); err != nil {
 		return err
 	}
-	pipe, err := pipeline.PipeRead(r, lzoReadPipeline)
-	if err != nil {
-		return err
+	for _, r := range rs {
+		pipe, err := pipeline.PipeRead(r, lzoReadPipeline)
+		if err != nil {
+			return err
+		}
+		if err = Unite(cluster, pipe); err != nil {
+			return err
+		}
+		if err = pipe.Close(); err != nil {
+			return err
+		}
 	}
-	defer pipe.Close()
-	return Extract(cluster, pipe)
+	return nil
 }

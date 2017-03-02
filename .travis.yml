@@ -2,11 +2,10 @@ language: go
 sudo: required
 dist: trusty
 go:
-  - 1.7
+  - 1.8
 env:
   - DATABASE_URL=postgres://postgres@localhost?sslmode=disable
 addons:
   postgresql: "9.5"
-before_script:
-  - go get -u github.com/kardianos/govendor
+before_script: go get -u github.com/kardianos/govendor
 script: govendor vet +local && govendor test +local -short -race -cover ./...

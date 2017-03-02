@@ -104,7 +104,6 @@ func (cmd *backupPush) Run() {
 type backupFetch struct {
 	cluster *string
 	name    *string
-	offset  *string
 }
 
 func (cmd *backupFetch) Name() string {
@@ -114,7 +113,6 @@ func (cmd *backupFetch) Name() string {
 func (cmd *backupFetch) DefineFlags(fs *flag.FlagSet) {
 	cmd.cluster = fs.String("cluster", "", "Path of cluster directory")
 	cmd.name = fs.String("name", "", "Name of backup")
-	cmd.offset = fs.String("offset", "", "Offset of backup")
 }
 
 func (cmd *backupFetch) Run() {
@@ -124,15 +122,15 @@ func (cmd *backupFetch) Run() {
 	if *cmd.name == "" {
 		log.Fatalln("law: name of backup required")
 	}
-	log.Printf("restoring backup %s:%s to %s", *cmd.name, *cmd.offset, *cmd.cluster)
+	log.Printf("restoring backup %s to %s", *cmd.name, *cmd.cluster)
 	o, err := operator.NewOperator(*storage)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err = o.Restore(*cmd.cluster, *cmd.name, *cmd.offset); err != nil {
+	if err = o.Restore(*cmd.cluster, *cmd.name); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("restored backup %s:%s to %s", *cmd.name, *cmd.offset, *cmd.cluster)
+	log.Printf("restored backup %s to %s", *cmd.name, *cmd.cluster)
 }
 
 var (

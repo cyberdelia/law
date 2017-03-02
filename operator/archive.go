@@ -2,11 +2,19 @@ package operator
 
 import (
 	"archive/tar"
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"syscall"
+)
+
+const (
+	// MaxPartitionSize represents the maximun size of a partition.
+	MaxPartitionSize = 1610612736
+	// MaxPartitionMembers represents the maximun numbers of menbers in a partition.
+	MaxPartitionMembers = int(MaxPartitionSize / 262144)
 )
 
 // File represents an archive file.
@@ -23,6 +31,31 @@ func (f *File) String() string {
 
 // Tape represents an archive.
 type Tape []*File
+
+// Partition creates multiple tapes for the given directory.
+func Partition(cluster string) (tapes []Tape, err error) {
+	var size int64
+	var tape Tape
+	files, err := walk(cluster)
+	if err != nil {
+		return nil, err
+	}
+	for _, file := range files {
+		if file.FileInfo.Size() > MaxPartitionSize {
+			// File is bigger than the max size of partition
+			return nil, errors.New("file too big for tar partition")
+		}
+		if (size+file.FileInfo.Size() >= MaxPartitionSize) ||
+			(len(tape) >= MaxPartitionMembers) {
+			tapes = append(tapes, tape)
+			tape = make(Tape, 0)
+			size = 0
+		}
+		tape = append(tape, file)
+		size += file.FileInfo.Size()
+	}
+	return append(tapes, tape), nil
+}
 
 // Copy writes a tar archive of all members.
 func (t Tape) Copy(w io.WriteCloser) error {
@@ -110,11 +143,11 @@ func Archive(cluster string) (Tape, error) {
 	return archive, nil
 }
 
-// Extract extracts the archive to the given directory.
-func Extract(cluster string, archive io.ReadCloser) error {
-	tr := tar.NewReader(archive)
+// Unite untar a partition for the given directory.
+func Unite(cluster string, partition io.ReadCloser) error {
+	archive := tar.NewReader(partition)
 	for {
-		header, err := tr.Next()
+		header, err := archive.Next()
 		if err != nil {
 			if err == io.EOF {
 				// End of archive
@@ -128,19 +161,13 @@ func Extract(cluster string, archive io.ReadCloser) error {
 			os.MkdirAll(filename, info.Mode())
 			continue
 		}
-		if isSymlink(info) {
-			os.Symlink(header.Linkname, filename)
-			continue
-		}
 		file, err := createFile(filename, info.Mode())
 		if err != nil {
 			return err
 		}
-		if _, err = io.Copy(file, tr); err != nil {
-			file.Close()
+		if _, err = io.Copy(file, archive); err != nil {
 			return err
 		}
-		file.Close()
 	}
 	return nil
 }

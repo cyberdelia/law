@@ -7,12 +7,13 @@ import (
 )
 
 // CurrentVersion is a version prefix to be used by storage backends.
-const CurrentVersion = "001"
+const CurrentVersion = "005"
 
 // Backend represents a storage backend.
 type Backend interface {
 	Create(name string) (io.WriteCloser, error)
 	Open(name string) (io.ReadCloser, error)
+	List(name string) ([]io.ReadCloser, error)
 }
 
 // Storage represents a storage facility.
@@ -43,24 +44,24 @@ func NewStorage(uri string) (*Storage, error) {
 
 // Archive returns a writer to archive the given wal segment.
 func (s Storage) Archive(name string) (io.WriteCloser, error) {
-	filename := fmt.Sprintf("law_%s/%s.lzo", CurrentVersion, name)
+	filename := fmt.Sprintf("wal_%s/%s.lzo", CurrentVersion, name)
 	return s.b.Create(filename)
 }
 
 // Unarchive returns a reader to restore the given wal segment.
 func (s Storage) Unarchive(name string) (io.ReadCloser, error) {
-	filename := fmt.Sprintf("law_%s/%s.lzo", CurrentVersion, name)
+	filename := fmt.Sprintf("wal_%s/%s.lzo", CurrentVersion, name)
 	return s.b.Open(filename)
 }
 
 // Backup returns a writer to archive the given backup.
-func (s Storage) Backup(name, offset string) (io.WriteCloser, error) {
-	filename := fmt.Sprintf("basebackup_%s/%s_%s.tar.lzo", CurrentVersion, name, offset)
+func (s Storage) Backup(name, offset string, n int) (io.WriteCloser, error) {
+	filename := fmt.Sprintf("basebackup_%s/base_%s_%s/part_%d.tar.lzo", CurrentVersion, name, offset, n)
 	return s.b.Create(filename)
 }
 
 // Restore returns a reader to restore the given backup.
-func (s Storage) Restore(name, offset string) (io.ReadCloser, error) {
-	filename := fmt.Sprintf("basebackup_%s/%s_%s.tar.lzo", CurrentVersion, name, offset)
-	return s.b.Open(filename)
+func (s Storage) Restore(name string) ([]io.ReadCloser, error) {
+	filename := fmt.Sprintf("basebackup_%s/%s/", CurrentVersion, name)
+	return s.b.List(filename)
 }

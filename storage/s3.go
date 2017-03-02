@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strconv"
+	"os"
 
 	s3 "github.com/cyberdelia/s3"
 )
@@ -28,37 +28,59 @@ func NewS3Storage(u *url.URL) *S3Storage {
 
 // Create creates a new file based on the given filename.
 func (s S3Storage) Create(name string) (io.WriteCloser, error) {
-	u, err := url.Parse(name)
+	uri, err := urlJoin(name, s.u)
 	if err != nil {
 		return nil, err
 	}
-	return s3.Create(s.u.ResolveReference(u).String(), http.Header{
+	return s3.Create(uri, http.Header{
 		"x-amz-server-side-encryption": []string{"AES256"},
 	}, s.client)
 }
 
 // Open opens the given filename.
 func (s S3Storage) Open(name string) (io.ReadCloser, error) {
-	u, err := url.Parse(name)
+	uri, err := urlJoin(name, s.u)
 	if err != nil {
 		return nil, err
 	}
-	r, _, err := s3.Open(s.u.ResolveReference(u).String(), s.client)
+	r, _, err := s3.Open(uri, s.client)
 	return r, err
 }
 
-func mustParseInt(q url.Values, key string, value int) int {
-	v, err := strconv.ParseInt(q.Get(key), 10, 64)
+// List lists all files presents in the file storage after the given prefix.
+func (s S3Storage) List(name string) (files []io.ReadCloser, err error) {
+	uri, err := urlJoin(name, s.u)
 	if err != nil {
-		return value
+		return nil, err
 	}
-	return int(v)
+	err = s3.Walk(uri, func(path string, info os.FileInfo) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return s3.SkipDir
+		}
+		uri, err := urlJoin(path, s.u)
+		if err != nil {
+			return err
+		}
+		file, _, err := s3.Open(uri, nil)
+		if err != nil {
+			return err
+		}
+		files = append(files, file)
+		return nil
+	}, s.client)
+	if err != nil {
+		return nil, err
+	}
+	return files, nil
 }
 
-func mustParseInt64(q url.Values, key string, value int64) int64 {
-	v, err := strconv.ParseInt(q.Get(key), 10, 64)
+func urlJoin(name string, prefix *url.URL) (string, error) {
+	u, err := url.Parse(name)
 	if err != nil {
-		return value
+		return "", err
 	}
-	return v
+	return prefix.ResolveReference(u).String(), nil
 }
