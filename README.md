@@ -16,8 +16,8 @@ $ go get github.com/cyberdelia/law
 Law make use of environment-variable, the base one are:
 
  - ``STORAGE_URL``: URL indicating where files are stored.
-   * For file storage: ``file:///tmp/law``
-   * For S3 storage: ``s3://law.s3.amazonaws.com/``
+   * For file storage: ``file:///tmp/``
+   * For S3 storage: ``s3://s3.amazonaws.com/bucket_name``
  - ``DATABASE_URL``: URL to database.
 
 S3 storage might requires one or more of theses variables:
