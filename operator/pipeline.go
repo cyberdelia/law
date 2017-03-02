@@ -1,22 +1,22 @@
 package operator
 
 import (
-	"compress/gzip"
 	"io"
 	"time"
 
+	"github.com/cyberdelia/lzo"
 	"github.com/cyberdelia/pipeline"
 	"github.com/cyberdelia/ratio"
 )
 
-// gzipWritePipeline returns a WritePipeline that compress data using GZIP.
-func gzipWritePipeline(w io.WriteCloser) (io.WriteCloser, error) {
-	return gzip.NewWriterLevel(w, gzip.BestSpeed)
+// lzoWritePipeline returns a WritePipeline that will compress data.
+func lzoWritePipeline(w io.WriteCloser) (io.WriteCloser, error) {
+	return lzo.NewWriter(w), nil
 }
 
-// gzipReadPipeline returns a ReadPipeline that decompress data using GZIP.
-func gzipReadPipeline(r io.ReadCloser) (io.ReadCloser, error) {
-	return gzip.NewReader(r)
+// lzoReadPipeline returns a ReadPipeline that will decompress data.
+func lzoReadPipeline(r io.ReadCloser) (io.ReadCloser, error) {
+	return lzo.NewReader(r)
 }
 
 // rateLimitWritePipeline returns a WritePipeline that will rate-limit write I/O.

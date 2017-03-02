@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "fRElsrDVJFFcp+hKDeDLL2vY7NQ=",
+			"path": "github.com/cyberdelia/lzo",
+			"revision": "d243f9b8319c41c7344f8ae6640cf803aaf8e54f",
+			"revisionTime": "2016-03-29T00:19:44Z"
+		},
+		{
 			"checksumSHA1": "8ESAwOEDrir7s0o0iPgdFsF1u2Q=",
 			"path": "github.com/cyberdelia/pipeline",
 			"revision": "9590e9faaddedd5e5dc9c29475e38da85344d126"
