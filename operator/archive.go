@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 )
 
 const (
@@ -65,7 +64,7 @@ func (t Tape) Copy(w io.WriteCloser) error {
 		file, err := os.Open(member.Path)
 		if err != nil {
 			// File might have been deleted, we can ignore it.
-			if isNotExist(err) {
+			if os.IsNotExist(err) {
 				continue
 			}
 			return err
@@ -181,18 +180,6 @@ func createFile(name string, mode os.FileMode) (*os.File, error) {
 
 func isSymlink(fi os.FileInfo) bool {
 	return fi.Mode()&os.ModeSymlink == os.ModeSymlink
-}
-
-func isNotExist(err error) bool {
-	switch pe := err.(type) {
-	case nil:
-		return false
-	case *os.PathError:
-		err = pe.Err
-	case *os.LinkError:
-		err = pe.Err
-	}
-	return err == syscall.ENOENT || err == os.ErrNotExist
 }
 
 func keepEmpty(path string) bool {

@@ -101,9 +101,6 @@ func (o *Operator) Backup(cluster string, rate int) error {
 		if err := pipe.Close(); err != nil {
 			return err
 		}
-		if err := w.Close(); err != nil {
-			return err
-		}
 	}
 	return nil
 }
