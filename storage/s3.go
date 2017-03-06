@@ -18,7 +18,6 @@ type S3Storage struct {
 // NewS3Storage create a new S3Storage base on
 // a s3:// URL.
 func NewS3Storage(u *url.URL) *S3Storage {
-	u.Scheme = "https"
 	u.RawQuery = ""
 	return &S3Storage{
 		u:      u,
