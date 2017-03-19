@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "E1PFzcuA2WI31nWAnkLe8uMezWg=",
+			"path": "github.com/cyberdelia/aws/s3",
+			"revision": "85ba16f797d6c753cda64fdf38a397126dd51045",
+			"revisionTime": "2017-03-19T01:24:03Z"
+		},
+		{
 			"checksumSHA1": "fRElsrDVJFFcp+hKDeDLL2vY7NQ=",
 			"path": "github.com/cyberdelia/lzo",
 			"revision": "d243f9b8319c41c7344f8ae6640cf803aaf8e54f",
@@ -19,12 +25,6 @@
 			"path": "github.com/cyberdelia/ratio",
 			"revision": "3b76052eb25068ccea02ad73698a076acbd2ae4e",
 			"revisionTime": "2014-10-11T02:26:55Z"
-		},
-		{
-			"checksumSHA1": "tF4dmr6KEWFfr+Zg5ZFR7tSMMVE=",
-			"path": "github.com/cyberdelia/s3",
-			"revision": "1ff5af85f4fa760ccd54074ea4be15290216a839",
-			"revisionTime": "2017-03-06T00:38:20Z"
 		},
 		{
 			"checksumSHA1": "dNYxHiBLalTqluak2/Z8c3RsSEM=",

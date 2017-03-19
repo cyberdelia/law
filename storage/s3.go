@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"os"
 
-	s3 "github.com/cyberdelia/s3"
+	s3 "github.com/cyberdelia/aws/s3"
 )
 
 // S3Storage represents a s3 based file storage.
