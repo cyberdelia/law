@@ -76,7 +76,6 @@ func (o *Operator) Backup(cluster string, rate int) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 	backup, err := db.StartBackup()
 	if err != nil {
 		return err
