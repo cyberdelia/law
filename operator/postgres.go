@@ -40,8 +40,10 @@ type offlineDatabase struct {
 
 // Backup represents a backup.
 type Backup struct {
-	Name   string
-	Offset string
+	Name       string
+	Offset     string
+	Label      string
+	Tablespace string
 }
 
 // NewDatabase returns a new Database based on the given given
@@ -65,11 +67,28 @@ func NewDatabase(dsn string) (Database, error) {
 	}
 }
 
+func (on *onlineDatabase) Version() (int, error) {
+	var version int
+	if err := on.QueryRow(`SHOW server_version_num`).Scan(version); err != nil {
+		return 0, err
+	}
+	return version, nil
+}
+
 // StartBackup starts a new backup.
 func (on *onlineDatabase) StartBackup() (*Backup, error) {
-	var name, offset string
+	version, err := on.Version()
+	if err != nil {
+		return nil, err
+	}
+	var name, offset, query string
+	if version < 90600 {
+		query = `SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(pg_start_backup($1))`
+	} else {
+		query = `SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(pg_start_backup($1, false, false))`
+	}
 	label := fmt.Sprintf("freeze_start_%s", time.Now().UTC().Format(time.RFC3339))
-	if err := on.QueryRow(`SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(pg_start_backup($1))`, label).Scan(&name, &offset); err != nil {
+	if err := on.QueryRow(query, label).Scan(&name, &offset); err != nil {
 		on.Close()
 		return nil, err
 	}
@@ -81,14 +100,25 @@ func (on *onlineDatabase) StartBackup() (*Backup, error) {
 
 // StopBackup stops the currently running backup.
 func (on *onlineDatabase) StopBackup() (*Backup, error) {
-	var name, offset string
 	defer on.Close()
-	if err := on.QueryRow(`SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(pg_stop_backup())`).Scan(&name, &offset); err != nil {
+	version, err := on.Version()
+	if err != nil {
+		return nil, err
+	}
+	var name, offset, label, tableSpace, query string
+	if version < 90600 {
+		query = `SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset, '' AS backup_label, '' AS tablespace_map FROM pg_xlogfile_name_offset(pg_stop_backup())`
+	} else {
+		query = `SELECT (SELECT file_name FROM pg_xlogfile_name_offset(lsn)), (SELECT lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(lsn)), labelfile AS backup_label, spcmapfile AS tablespace_map FROM pg_stop_backup(false);`
+	}
+	if err := on.QueryRow(query).Scan(&name, &offset, &label, &tableSpace); err != nil {
 		return nil, err
 	}
 	return &Backup{
-		Name:   name,
-		Offset: offset,
+		Name:       name,
+		Offset:     offset,
+		Label:      label,
+		Tablespace: tableSpace,
 	}, nil
 }
 
