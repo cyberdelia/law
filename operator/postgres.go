@@ -53,7 +53,11 @@ func NewDatabase(dsn string) (Database, error) {
 	}
 	switch u.Scheme {
 	case "postgres":
-		return &onlineDatabase{dataSourceName: dsn}, nil
+		db, err := sql.Open("postgres", dsn)
+		if err != nil {
+			return nil, err
+		}
+		return &onlineDatabase{dataSourceName: dsn, DB: db}, nil
 	case "file":
 		return &offlineDatabase{dataSourceName: dsn}, nil
 	default:
@@ -63,14 +67,10 @@ func NewDatabase(dsn string) (Database, error) {
 
 // StartBackup starts a new backup.
 func (on *onlineDatabase) StartBackup() (*Backup, error) {
-	db, err := sql.Open("postgres", on.dataSourceName)
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
 	var name, offset string
 	label := fmt.Sprintf("freeze_start_%s", time.Now().UTC().Format(time.RFC3339))
-	if err := db.QueryRow(`SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(pg_start_backup($1))`, label).Scan(&name, &offset); err != nil {
+	if err := on.QueryRow(`SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(pg_start_backup($1))`, label).Scan(&name, &offset); err != nil {
+		on.Close()
 		return nil, err
 	}
 	return &Backup{
@@ -81,12 +81,8 @@ func (on *onlineDatabase) StartBackup() (*Backup, error) {
 
 // StopBackup stops the currently running backup.
 func (on *onlineDatabase) StopBackup() (*Backup, error) {
-	db, err := sql.Open("postgres", on.dataSourceName)
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
 	var name, offset string
+	defer on.Close()
 	if err := on.QueryRow(`SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(pg_stop_backup())`).Scan(&name, &offset); err != nil {
 		return nil, err
 	}
