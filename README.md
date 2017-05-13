@@ -19,6 +19,8 @@ Law make use of environment-variable, the base one are:
    * For file storage: ``file:///tmp/``
    * For S3 storage: ``s3://s3.amazonaws.com/bucket_name``
  - ``DATABASE_URL``: URL to database.
+   * For online backup: ``postgres://locahost:5432/`` or ``postgres:///tmp/.s.PGSQL.5432``
+   * For offline backup: ``file:///usr/local/var/postgres``
 
 S3 storage might requires one or more of theses variables:
 
