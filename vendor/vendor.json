@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "i/o8et2JhdTUwP+Rmi36EBCHtU4=",
+			"path": "github.com/cyberdelia/aws",
+			"revision": "85ba16f797d6c753cda64fdf38a397126dd51045",
+			"revisionTime": "2017-03-19T01:24:03Z"
+		},
+		{
 			"checksumSHA1": "E1PFzcuA2WI31nWAnkLe8uMezWg=",
 			"path": "github.com/cyberdelia/aws/s3",
 			"revision": "85ba16f797d6c753cda64fdf38a397126dd51045",
@@ -27,18 +33,18 @@
 			"revisionTime": "2014-10-11T02:26:55Z"
 		},
 		{
-			"checksumSHA1": "dNYxHiBLalTqluak2/Z8c3RsSEM=",
+			"checksumSHA1": "uTUsjF7bymOuKvXbW2BpkK/w4Vg=",
 			"comment": "go1.0-cutoff-111-g80f8150",
 			"path": "github.com/lib/pq",
-			"revision": "50761b0867bd1d9d069276790bcd4a3bccf2324a",
-			"revisionTime": "2016-08-31T22:25:20Z"
+			"revision": "2704adc878c21e1329f46f6e56a1c387d788ff94",
+			"revisionTime": "2017-03-24T20:46:54Z"
 		},
 		{
-			"checksumSHA1": "xppHi82MLqVx1eyQmbhTesAEjx8=",
+			"checksumSHA1": "Gk3jTNQ5uGDUE0WMJFWcYz9PMps=",
 			"comment": "go1.0-cutoff-111-g80f8150",
 			"path": "github.com/lib/pq/oid",
-			"revision": "50761b0867bd1d9d069276790bcd4a3bccf2324a",
-			"revisionTime": "2016-08-31T22:25:20Z"
+			"revision": "2704adc878c21e1329f46f6e56a1c387d788ff94",
+			"revisionTime": "2017-03-24T20:46:54Z"
 		}
 	],
 	"rootPath": "github.com/cyberdelia/law"
