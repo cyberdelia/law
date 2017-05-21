@@ -129,19 +129,6 @@ func walk(cluster string) (files []*File, err error) {
 	return files, err
 }
 
-// Archive creates an archive for the given directory.
-func Archive(cluster string) (Tape, error) {
-	var archive []*File
-	files, err := walk(cluster)
-	if err != nil {
-		return nil, err
-	}
-	for _, file := range files {
-		archive = append(archive, file)
-	}
-	return archive, nil
-}
-
 // Unite untar a partition for the given directory.
 func Unite(cluster string, partition io.ReadCloser) error {
 	archive := tar.NewReader(partition)
