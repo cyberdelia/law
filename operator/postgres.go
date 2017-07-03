@@ -28,8 +28,6 @@ type Database interface {
 
 type onlineDatabase struct {
 	dataSourceName string
-
-	*sql.DB
 }
 
 type offlineDatabase struct {
@@ -87,7 +85,7 @@ func (on *onlineDatabase) StopBackup() (*Backup, error) {
 	}
 	defer db.Close()
 	var name, offset string
-	if err := on.QueryRow(`SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(pg_stop_backup())`).Scan(&name, &offset); err != nil {
+	if err := db.QueryRow(`SELECT file_name, lpad(file_offset::text, 8, '0') AS file_offset FROM pg_xlogfile_name_offset(pg_stop_backup())`).Scan(&name, &offset); err != nil {
 		return nil, err
 	}
 	return &Backup{

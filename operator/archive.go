@@ -69,15 +69,11 @@ func (t Tape) Copy(w io.WriteCloser) error {
 			}
 			return err
 		}
-		info, err := os.Lstat(member.Path)
-		if err != nil {
-			return err
-		}
 		link, err := filepath.EvalSymlinks(member.Path)
 		if err != nil {
 			return err
 		}
-		header, err := tar.FileInfoHeader(info, link)
+		header, err := tar.FileInfoHeader(member.FileInfo, link)
 		if err != nil {
 			return err
 		}
@@ -85,7 +81,7 @@ func (t Tape) Copy(w io.WriteCloser) error {
 		if err := archive.WriteHeader(header); err != nil {
 			return err
 		}
-		if !info.Mode().IsRegular() {
+		if !member.FileInfo.Mode().IsRegular() {
 			continue
 		}
 		if _, err = io.Copy(archive, file); err != nil {
