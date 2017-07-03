@@ -106,8 +106,8 @@ func walk(cluster string) (files []*File, err error) {
 			// An error occured, stop processing
 			return err
 		}
-		if info.Name() == "postgresql.conf" || info.Name() == "postmaster.pid" {
-			// Ignore configuration and pid files
+		if ignoreFile(info.Name()) {
+			// Ignore configuration, pid and other files
 			return nil
 		}
 		rel, err := filepath.Rel(cluster, path)
@@ -169,9 +169,22 @@ func isSymlink(fi os.FileInfo) bool {
 	return fi.Mode()&os.ModeSymlink == os.ModeSymlink
 }
 
+func ignoreFile(filename string) bool {
+	files := []string{
+		"postmaster.pid", "postmaster.opts", "postgresql.conf", "pg_hba.conf",
+		"recovery.conf", "recovery.done", "pg_ident.conf", "promote",
+	}
+	for _, file := range files {
+		if file == filename {
+			return true
+		}
+	}
+	return false
+}
+
 func keepEmpty(path string) bool {
-	whitelist := []string{"pg_xlog", "pg_log", "pg_replslot", "pg_wal", "pgsql_tmp", "pg_stat_tmp"}
-	for _, name := range whitelist {
+	directories := []string{"pg_xlog", "pg_log", "pg_replslot", "pg_wal", "pgsql_tmp", "pg_stat_tmp"}
+	for _, name := range directories {
 		if strings.Contains(path, name) {
 			return true
 		}
