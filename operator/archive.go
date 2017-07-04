@@ -69,9 +69,11 @@ func (t Tape) Copy(w io.WriteCloser) error {
 			}
 			return err
 		}
-		link, err := filepath.EvalSymlinks(member.Path)
-		if err != nil {
-			return err
+		var link string
+		if isSymlink(member.FileInfo) {
+			if link, err = filepath.EvalSymlinks(member.Path); err != nil {
+				return err
+			}
 		}
 		header, err := tar.FileInfoHeader(member.FileInfo, link)
 		if err != nil {
@@ -162,7 +164,7 @@ func createFile(name string, mode os.FileMode) (*os.File, error) {
 }
 
 func isSymlink(fi os.FileInfo) bool {
-	return fi.Mode()&os.ModeSymlink == os.ModeSymlink
+	return fi.Mode()&os.ModeSymlink != 0
 }
 
 func ignoreFile(filename string) bool {
